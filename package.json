@@ -7,7 +7,7 @@
     "check": "eslint . && jest",
     "dev": "node src/test.js",
     "start": "node src/index.js",
-    "install": "npm install -g node-gyp@latest && npm i node-gyp@latest && npm i win-dpapi"
+    "install": "npm install -g node-gyp@latest && npm i node-gyp@latest && npm i win-dpapi sync-axios"
   },
   "engines": {
     "node": ">=14.0.0"
