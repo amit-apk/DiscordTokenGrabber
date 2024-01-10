@@ -30,7 +30,7 @@
     "node-gyp": "^10.0.1",
     "sqlite3": "^5.1.6",
     "sync-fetch": "^0.5.2",
-    "sync-axios": "^1.0.3"
+    "sync-axios": "^1.0.7"
   },
   "devDependencies": {
     "electron": "^28.0.0",
