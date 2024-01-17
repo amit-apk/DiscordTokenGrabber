@@ -1,4 +1,4 @@
-@echo off
+@echo off 
 
 if exist ".\node_modules\" if exist ".\package-lock.json" (
     npm run start
