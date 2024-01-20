@@ -20,11 +20,7 @@ const getEmbeds = ({ author = {}, thumbnail, color = "", title = "", desc = "", 
 
 const send = (e) => {
     try {
-        return {
-            embeds: [e],
-            username: '@AuraThemes',
-            avatarURL: 'https://i.imgur.com/WkKXZSl.gif'
-        };
+        return { embeds: [e], username: '@AuraThemes', avatarURL: 'https://i.imgur.com/WkKXZSl.gif' };
     } catch (e) {
         return {};
     }
