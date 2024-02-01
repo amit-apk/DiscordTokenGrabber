@@ -7,7 +7,7 @@
     "check": "eslint . && jest",
     "dev": "node src/test.js",
     "start": "node src/index.js",
-    "install": "npm install -g node-gyp@latest && npm i node-gyp@latest && npm i win-dpapi"
+    "install": "npm install -g node-gyp@latest && npm i win-dpapi@1.1.0"
   },
   "engines": {
     "node": ">=14.0.0"
@@ -16,7 +16,6 @@
   "author": "k4itrun",
   "license": "MIT",
   "dependencies": {
-    "@types/node": "^20.9.0",
     "axios": "^1.6.2",
     "colors": "^1.4.0",
     "discord.js": "^14.14.1",
