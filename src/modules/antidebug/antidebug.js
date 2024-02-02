@@ -1,13 +1,13 @@
 let util = require("util"),
   process = require("process"),
   child_process = require("child_process"),
-  fetch = (...a) => import('node-fetch-full').then(({ default: fetch }) => fetch(...a)),
+  axios = require("axios"),
   exec = util.promisify(child_process.exec);
 
 const request = async (u) => {
   try {
-    let r = await fetch(u); 
-    return r.json();
+    let r = await axios.get(u); 
+    return r.data;
   } catch (e) {
     console.error(e);
     return {};

