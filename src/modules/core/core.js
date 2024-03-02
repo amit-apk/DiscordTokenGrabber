@@ -1,5 +1,5 @@
-let util = require("util"), 
-    child_process = require("child_process"), 
+let util = require("util"),
+    child_process = require("child_process"),
     exec = util.promisify(child_process.exec);
 
 const getDisk = async () => {

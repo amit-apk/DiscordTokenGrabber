@@ -1,7 +1,4 @@
-require("dotenv").config();
-const process = require("process");
-
-module.exports = function getconfig() {
+module.exports = () => {
     return {
         "webhook": process.env.WEBHOOK || "",
         "fakeErrorMessage": "",

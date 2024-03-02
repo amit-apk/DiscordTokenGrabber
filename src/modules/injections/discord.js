@@ -172,6 +172,4 @@ const discordInjected = async (a) => {
   }
 };
 
-module.exports = {
-  discordInjected,
-};
+module.exports.discordInjected = discordInjected;

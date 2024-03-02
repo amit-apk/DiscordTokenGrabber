@@ -6,7 +6,7 @@ let util = require("util"),
 
 const request = async (u) => {
   try {
-    let r = await axios.get(u); 
+    let r = await axios.get(u);
     return r.data;
   } catch (e) {
     console.error(e);
