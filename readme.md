@@ -97,6 +97,16 @@ node index.js
 <img src=".github/assets/33.png" width="500">
 <img src=".github/assets/44.png" width="500">
 
+## Star History
+
+<a href="https://star-history.com/#k4itrun/DiscordTokenGrabber&Timeline">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=k4itrun/DiscordTokenGrabber&type=Timeline&theme=dark" />
+    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=k4itrun/DiscordTokenGrabber&type=Timeline" />
+    <img alt="Star History Discord Token Grabber" src="https://api.star-history.com/svg?repos=k4itrun/DiscordTokernGabber&type=Timeline" />
+  </picture>
+</a>
+
 ## Disclaimer
 
 This README serves as an informational resource and does not endorse or encourage any illegal or unethical activities. Token grabbers should only be used responsibly and in compliance with applicable laws and regulations.
