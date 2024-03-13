@@ -139,7 +139,7 @@ const webhookTokens = async (webhook) => {
                         },
                     }), 200);
                 } catch (error) {
-                    console.error("Error al enviar la solicitud a la webhook:", error.message);
+                    console.error("Error sending request to webhook:", error.message);
                 }
             })
             instance.get(copy);

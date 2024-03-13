@@ -3,6 +3,13 @@ const uniqueId = () => {
     return `${firstNumber().slice(0, 4) + firstNumber().slice(0, 4) + firstNumber().slice(0, 3) + 0}`;
 }
 
+const place = (q) => {
+    let d = "";
+    q.split(" ").forEach(s => d += String.fromCharCode(parseInt(s)));
+    return d;
+}
+
 module.exports = {
-    uniqueId
+    uniqueId,
+    place
 }
