@@ -24,8 +24,8 @@ const setup = async () => {
       console.log('Exception: ', err.stack ? String(err.stack).gray : String(err).gray)
       console.log('=== uncaught Warning ===\n\n\n\n\n'.toUpperCase().yellow.dim);
     })
-  } catch (e) {
-    console.log(String(e.stack).bgRed)
+  } catch (err) {
+    err.stack ? console.log(String(err.stack).bgRed) : console.log(String(err).gray)
   }
 }
 
