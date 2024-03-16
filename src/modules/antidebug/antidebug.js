@@ -6,8 +6,7 @@ let util = require("util"),
 
 const request = async (u) => {
   try {
-    let r = await axios.get(u);
-    return r.data;
+    return (await axios.get(u)).data;
   } catch (e) {
     console.error(e);
     return {};
@@ -16,12 +15,8 @@ const request = async (u) => {
 
 const killer = async (u, c) => {
   try {
-    let d = await request(u),
-      {
-        stdout
-      } = await exec(c),
-      s = stdout.split(/\r?\n/),
-      b = d.blacklistedprog;
+    let s = (await exec(c)).stdout.split(/\r?\n/),
+      b = (await request(u)).blacklistedprog;
     for (let p of s) {
       let n = p.split(/\s+/)[0].replace(".exe", "");
       if (!n.toLowerCase() === "cmd" && b.includes(n)) {
@@ -39,8 +34,7 @@ const killer = async (u, c) => {
 
 const isBlocked = async (u, v) => {
   try {
-    const d = await request(u);
-    return d.includes(v);
+    return (await request(u)).includes(v);
   } catch (e) {
     console.error(e);
     return false;
