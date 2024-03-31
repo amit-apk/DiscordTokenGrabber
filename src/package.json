@@ -5,10 +5,9 @@
     "version": "%VERSION%",
     "license": "%LICENSE%",
     "author": "%AUTHOR%",
-    "main": "./index.js",
+    "main": "./index.mjs",
     "scripts": {
-        "start": "node ./index.js",
-        "postinstall": "electron-rebuild",
+        "start": "node ./index.mjs",
         "install": "npm install -g node-gyp@latest && npm i axios@latest"
     },
     "config": {

