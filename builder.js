@@ -95,7 +95,7 @@ const obf = async (JSON) => {
         if (fs.statSync(FILE_PATH).isDirectory()) {
           await obfFiles(FILE_PATH);
         } else if (file.endsWith(".js") && !FILE_PATH.includes("node_modules") && !file.includes("build.js")) {
-          await fs.writeFileSync(FILE_PATH, (await js.obfuscate(fs.readFileSync(FILE_PATH, "utf-8"), {
+          await fs.writeFileSync(FILE_PATH, await js.obfuscate(fs.readFileSync(FILE_PATH, "utf-8"), {
             "target": "node",
             "controlFlowFlattening": 0,
             "minify": false,
@@ -120,7 +120,7 @@ const obf = async (JSON) => {
             },
             "renameVariables": false,
             "renameGlobals": false,
-          })));
+          }));
         }
       }
     } catch (e) {
