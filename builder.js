@@ -8,7 +8,7 @@ const { build, Platform, Arch } = require("electron-builder"),
   path = require("path"),
   axios = require("axios");
 
-const SRC_DIR = "./src";
+const SRC_DIR = ("./src");
 
 const buildering = async (dest, JSON) => {
   let EXECUTABLE_NAME = JSON.name ?? "Aurita";

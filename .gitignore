@@ -16,6 +16,7 @@ yarn-error.log
 *.log
 *.zip
 *.rar
+*.exe
 *.txt
 
 # Ignore editor specific files
