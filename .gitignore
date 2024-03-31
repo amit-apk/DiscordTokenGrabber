@@ -18,6 +18,7 @@ yarn-error.log
 *.rar
 *.exe
 *.txt
+*.ico
 
 # Ignore editor specific files
 .vscode/
