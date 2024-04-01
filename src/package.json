@@ -23,7 +23,6 @@
         "axios": "^1.6.8",
         "colors": "^1.4.0",
         "dotenv": "^16.3.1",
-        "sqlite3": "^5.0.8",
         "win-dpapi": "github:k4itrun/node-dpapi"
     }
 }
