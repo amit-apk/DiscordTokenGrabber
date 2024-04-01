@@ -1,2 +1,2 @@
 @echo off
-node builder.mjs
+node builder.js

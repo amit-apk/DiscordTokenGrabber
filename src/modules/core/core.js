@@ -1,5 +1,5 @@
-import { promisify } from "util";
-import child_process from "child_process";
+const { promisify } = require("util");
+const child_process = require("child_process");
 
 const exec = promisify(child_process.exec);
 
@@ -59,7 +59,7 @@ const get_cpu_count = async () => {
     }
 };
 
-export const get_info = async () => {
+const get_info = async () => {
     try {
         const [
             DISK,
@@ -112,3 +112,8 @@ export const get_info = async () => {
         };
     }
 };
+
+
+module.exports = {
+    get_info
+}

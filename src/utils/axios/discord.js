@@ -1,4 +1,4 @@
-import axios from "axios";
+const axios = require("axios");
 
 const request = async (endpoint, token) => {
     try {
@@ -220,7 +220,7 @@ const get_status_emoji = (s) => {
     return status[s];
 };
 
-export const get_discord_Info = async (token) => {
+const get_discord_Info = async (token) => {
     try {
         let me = await request(`/v9/users/@me`, token);
         if (me === "Invalid") return;
@@ -277,4 +277,8 @@ export const get_discord_Info = async (token) => {
         console.log(e)
         return e
     }
+};
+
+module.exports = { 
+    get_discord_Info 
 };

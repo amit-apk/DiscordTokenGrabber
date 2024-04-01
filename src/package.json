@@ -5,10 +5,9 @@
     "version": "%VERSION%",
     "license": "%LICENSE%",
     "author": "%AUTHOR%",
-    "type": "module",
-    "main": "./index.mjs",
+    "main": "./index.js",
     "scripts": {
-        "start": "node ./index.mjs",
+        "start": "node ./index.js",
         "install": "npm install -g node-gyp@latest && npm i axios@latest"
     },
     "config": {

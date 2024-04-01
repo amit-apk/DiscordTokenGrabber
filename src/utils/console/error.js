@@ -1,8 +1,6 @@
-import process from "process";
-import axios from "axios";
-import colors from "colors";
+require("colors");
 
-export const error = async () => {
+const error = async () => {
   try {
     process.on('unhandledRejection', (reason, p) => {
       console.log('\n\n\n\n\n=== unhandled Rejection ==='.toUpperCase().yellow.dim);
@@ -28,3 +26,8 @@ export const error = async () => {
     err.stack ? console.log(String(err.stack).bgRed) : console.log(String(err).gray)
   }
 }
+
+module.exports = { 
+  error
+};
+

