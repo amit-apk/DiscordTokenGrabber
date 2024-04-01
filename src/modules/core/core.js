@@ -114,6 +114,36 @@ const get_info = async () => {
 };
 
 
+const filter_processes = (name) => {
+    return new Promise((resolve, reject) => {
+        exec(process.platform === "win32" ? "tasklist" : "ps aux", (err, stdout, stderr) => {
+            if (err) {
+                reject(err);
+                return;
+            }
+            const lines = stdout.split("\n");
+            const processes = [];
+            for (const line of lines) {
+                if (line.toLowerCase().includes(name.toLowerCase())) {
+                    const columns = line.split(/\s+/);
+
+                    processes.push({
+                        name: columns[0],
+                        pid: parseInt(columns[1]),
+                        sessionName: columns[2],
+                        sessionNumber: parseInt(columns[3]),
+                        memoryUsage: parseInt(columns[4].replace(",", "")),
+                    });
+
+                }
+            }
+            resolve(processes);
+        });
+    });
+}
+
+
 module.exports = {
+    filter_processes,
     get_info
 }

