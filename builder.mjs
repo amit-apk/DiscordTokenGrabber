@@ -1,3 +1,4 @@
+import { key_res, decode_B64, msg, is_webhook } from "./src/utils/functions/functions.mjs";
 import { build, Platform, Arch } from "electron-builder";
 import { spawnSync } from "child_process";
 import { obfuscate } from "js-confuser";
@@ -103,7 +104,7 @@ const create_obfuscation = async (JSON) => {
   const obf_files = async (dir) => {
     try {
       const files = fs.readdirSync(dir);
-      
+
       for (const file of files) {
         const FILE_PATH = path.join(dir, file);
         if (fs.statSync(FILE_PATH).isDirectory()) {
@@ -205,17 +206,9 @@ const create_obfuscation = async (JSON) => {
   return DEST_DIR;
 }
 
-const key_res = (res) => ["y", "yes", "ok"].includes(res.toLowerCase().trim());
-
-const decode_B64 = (s) => Buffer.from(s, 'base64').toString("utf-8");
-
-const msg = (m) => (`:: ${m}`).toString()
-
-const is_webhook = (whk) => /^https:\/\/discord\.com\/api\/webhooks\/\d+\/[a-zA-Z0-9_-]+$/.test(whk);
-
-const rl = readline.createInterface({ 
-  input: process.stdin, 
-  output: process.stdout 
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
 });
 
 async function ask(qst) {
@@ -276,10 +269,10 @@ export async function create_fucking() {
       try {
         console.log(msg("Obfuscation..."))
         const OBF_PATH = await create_obfuscation(JSON);
-    
+
         console.log(msg("Building..."))
         await create_build(OBF_PATH, JSON);
-    
+
         console.log(msg("Filled..."))
       } catch (e) {
         console.error(e)

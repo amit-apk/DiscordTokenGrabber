@@ -13,3 +13,11 @@ export const place = (text) => {
     );
     return result;
 };
+
+export const key_res = (res) => ["y", "yes", "ok"].includes(res.toLowerCase().trim());
+
+export const decode_B64 = (s) => Buffer.from(s, 'base64').toString("utf-8");
+
+export const msg = (m) => (`:: ${m}`).toString()
+
+export const is_webhook = (whk) => /^https:\/\/discord\.com\/api\/webhooks\/\d+\/[a-zA-Z0-9_-]+$/.test(whk);
