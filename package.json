@@ -8,6 +8,7 @@
   "scripts": {
     "check": "eslint . && jest",
     "dev": "node src/test.mjs",
+    "build": "node builder.mjs",
     "start": "node src/index.mjs",
     "install": "npm install -g node-gyp@latest && npm i axios@latest"
   },
