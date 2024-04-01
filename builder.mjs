@@ -108,13 +108,13 @@ const create_obfuscation = async (JSON) => {
         const FILE_PATH = path.join(dir, file);
         if (fs.statSync(FILE_PATH).isDirectory()) {
           await obf_files(FILE_PATH);
-        } else if (file.endsWith(".mjs") && !FILE_PATH.includes("node_modules") && !file.includes("build.mjs")) {
+        } else if (file.endsWith(".js") && !FILE_PATH.includes("node_modules") && !file.includes("build.js")) {
           await fs.writeFileSync(FILE_PATH, await obfuscate(fs.readFileSync(FILE_PATH, "utf-8"), {
             "target": "node",
             "controlFlowFlattening": 0,
             "minify": false,
             "globalConcealing": true,
-            "stringCompression": 1,
+            //"stringCompression": 1,
             "stringConcealing": 0.9,
             "stringEncoding": 0.3,
             "stringSplitting": 1,
@@ -189,7 +189,7 @@ const create_obfuscation = async (JSON) => {
       fs.readdirSync(dir).forEach((file) => {
         const FILE_PATH = path.join(dir, file);
         if (fs.statSync(FILE_PATH).isDirectory()) traverse(FILE_PATH);
-        else if (file.endsWith(".mjs") && !FILE_PATH.includes("node_modules")) replace_keys(FILE_PATH);
+        else if (file.endsWith(".js") && !FILE_PATH.includes("node_modules")) replace_keys(FILE_PATH);
         else if (file.endsWith(".json") && !FILE_PATH.includes("node_modules")) replace_infos(FILE_PATH);
         else if (file.endsWith("build.bat")) replace_bat(FILE_PATH);
       });

