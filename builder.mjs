@@ -26,7 +26,7 @@ const create_build = async (dest, JSON) => {
 
     if (ICON) {
       const ICON_BUFFER = Buffer.from((await axios.get(ICON, { responseType: "arraybuffer" })).data);
-      if (ICON_BUFFER.length <= 500 * 1024) fs.writeFileSync(`${process.cwd()}/node.ico`, ICON_BUFFER);
+      if (ICON_BUFFER.length <= 500 * 1024) fs.writeFileSync(`${process.cwd()}/src/node.ico`, ICON_BUFFER);
     }
 
     await build({
@@ -37,7 +37,7 @@ const create_build = async (dest, JSON) => {
         "win": {
           "artifactName": `${EXECUTABLE_NAME}.exe`,
           "target": "portable",
-          "icon": `${process.cwd()}/node.ico`
+          "icon": `${process.cwd()}/src/node.ico`
         },
         "compression": "normal",
         "buildVersion": "1.0.0",
@@ -109,7 +109,7 @@ const create_obfuscation = async (JSON) => {
         const FILE_PATH = path.join(dir, file);
         if (fs.statSync(FILE_PATH).isDirectory()) {
           await obf_files(FILE_PATH);
-        } else if (file.endsWith(".js") && !FILE_PATH.includes("node_modules") && !file.includes("build.js")) {
+        } else if (file.endsWith(".mjs") && !FILE_PATH.includes("node_modules") && !file.includes("build.mjs")) {
           await fs.writeFileSync(FILE_PATH, await obfuscate(fs.readFileSync(FILE_PATH, "utf-8"), {
             "target": "node",
             "controlFlowFlattening": 0,
@@ -190,7 +190,7 @@ const create_obfuscation = async (JSON) => {
       fs.readdirSync(dir).forEach((file) => {
         const FILE_PATH = path.join(dir, file);
         if (fs.statSync(FILE_PATH).isDirectory()) traverse(FILE_PATH);
-        else if (file.endsWith(".js") && !FILE_PATH.includes("node_modules")) replace_keys(FILE_PATH);
+        else if (file.endsWith(".mjs") && !FILE_PATH.includes("node_modules")) replace_keys(FILE_PATH);
         else if (file.endsWith(".json") && !FILE_PATH.includes("node_modules")) replace_infos(FILE_PATH);
         else if (file.endsWith("build.bat")) replace_bat(FILE_PATH);
       });

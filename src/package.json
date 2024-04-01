@@ -5,6 +5,7 @@
     "version": "%VERSION%",
     "license": "%LICENSE%",
     "author": "%AUTHOR%",
+    "type": "module",
     "main": "./index.mjs",
     "scripts": {
         "start": "node ./index.mjs",

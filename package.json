@@ -4,6 +4,7 @@
   "description": "Best Token Grabber for Discord.",
   "license": "MIT",
   "author": "k4itrun",
+  "type": "module",
   "main": "./src/index.mjs",
   "scripts": {
     "check": "eslint . && jest",
