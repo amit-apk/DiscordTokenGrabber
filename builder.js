@@ -217,7 +217,7 @@ async function create_fucking() {
       });
 
       console.clear();
-      console.log(instagram(MAIN_BANNER));
+      console.log(instagram(MAIN_BANNER)); 
 
       let webhook = await ask("Add your \"WEBHOOK\": ");
       while (!is_webhook(webhook)) webhook = await ask("Add a \"WEBHOOK\" validity: ");
