@@ -180,12 +180,11 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
+let CURRENT_QST = 0;
+
 async function ask(qst) {
-  let CURRENT_QST;
-  CURRENT_QST = 1;
   try {
     CURRENT_QST++;
-
     return (await new Promise((resolve, reject) => {
       rl.question(atlas(`Question ${CURRENT_QST}: ${qst}`), (ans) => {
         resolve(ans);
