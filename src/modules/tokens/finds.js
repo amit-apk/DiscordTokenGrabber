@@ -32,7 +32,6 @@ async function get_tokens(p) {
 
                     if (m) {
                         m.forEach((tkn) => {
-                            token = []
                             if (!tokens.includes(tkn)) {
                                 return tokens.push(`browsers_tokens_${tkn}`);
                             }
