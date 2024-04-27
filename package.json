@@ -20,6 +20,8 @@
     "chalk-animation": "^1.6.0",
     "colors": "^1.4.0",
     "dotenv": "^16.3.1",
+    "image-to-ico": "^1.0.1",
+    "jimp": "^0.22.12",
     "js-confuser": "^1.7.1"
   },
   "devDependencies": {

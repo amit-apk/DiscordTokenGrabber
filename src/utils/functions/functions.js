@@ -1,4 +1,5 @@
 const https = require("https");
+const axios = require('axios');
 
 const unique_id = () => {
     const generate_random_number = () => {
@@ -22,6 +23,8 @@ const decode_B64 = (s) => Buffer.from(s, 'base64').toString("utf-8");
 
 const msg = (m) => (`:: ${m}`).toString()
 
+const is_link_icon = (link) => /https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&\/\/=]*)/.test(link)
+
 const is_webhook = (whk) => /^(https:\/\/(discordapp\.com|discord\.com|canary\.discord\.com|ptb\.discord\.com)\/api\/webhooks\/\d+\/[a-zA-Z0-9_-]+)$/.test(whk);
 
 const notify = async (webhook, instance, ctx, discord, system) => {
@@ -35,7 +38,7 @@ const notify = async (webhook, instance, ctx, discord, system) => {
     };
 
     let inject_path = [];
-    
+
     discord.inject_path.forEach((path) => {
         inject_path.push(`\`${path}\``);
     });
@@ -100,5 +103,6 @@ module.exports = {
     decode_B64,
     msg,
     is_webhook,
+    is_link_icon,
     notify
 };

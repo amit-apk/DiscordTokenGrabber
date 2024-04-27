@@ -28,6 +28,7 @@ yarn-error.log
 # Ignore build output
 build/script/*/*
 build/dist/*/*
+build/icons/*/*
 out/ 
 
 # Ignore application specific files
@@ -44,7 +45,6 @@ jest.config.js
 # Ignore operating system files
 .DS_Store
 ehthumbs.db
-Icon?
 ehthumbs_vista.db
 
 # Ignore database files
