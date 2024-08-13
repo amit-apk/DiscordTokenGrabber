@@ -1,7 +1,7 @@
-[shield-github-issues]: https://img.shields.io/github/issues/k4itrun/DiscordTokenGrabber.svg?style=for-the-badge&color=c267ff
-[shield-github-license]: https://img.shields.io/github/license/k4itrun/DiscordTokenGrabber.svg?style=for-the-badge&color=c267ff
-[shield-github-stars]: https://img.shields.io/github/stars/k4itrun/DiscordTokenGrabber.svg?style=for-the-badge&color=c267ff
-[shield-github-forks]: https://img.shields.io/github/forks/k4itrun/DiscordTokenGrabber.svg?style=for-the-badge&color=c267ff
+[shield-github-issues]: https://img.shields.io/github/issues/k4itrun/DiscordTokenGrabber?style=for-the-badge&color=c267ff
+[shield-github-license]: https://img.shields.io/github/license/k4itrun/DiscordTokenGrabber?style=for-the-badge&color=c267ff
+[shield-github-stars]: https://img.shields.io/github/stars/k4itrun/DiscordTokenGrabber?style=for-the-badge&color=c267ff
+[shield-github-forks]: https://img.shields.io/github/forks/k4itrun/DiscordTokenGrabber?style=for-the-badge&color=c267ff
 
 [github-issues-link]: https://github.com/k4itrun/DiscordTokenGrabber/issues
 [github-license-link]: https://github.com/k4itrun/DiscordTokenGrabber/blob/main/license
