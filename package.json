@@ -1,0 +1,23 @@
+{
+  "name": "discordtokengrabber",
+  "version": "2.0.0",
+  "description": "The best free token grabber for Discord.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "keywords": [],
+  "author": "k4itrun",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://140.82.112.4/k4itrun/discordtokengrabber"
+  },
+  "bugs": {
+    "url": "https://140.82.112.4/k4itrun/discordtokengrabber/issues"
+  },
+  "homepage": "https://140.82.112.4/k4itrun/discordtokengrabber#readme"
+}
