@@ -200,7 +200,7 @@ npm i && node builder
     <img alt="Star History Discord Token Grabber" src="https://api.star-history.com/svg?repos=k4itrun/DiscordTokernGabber&type=Timeline" />
   </picture>
 </a>
-
+ 
 ## Disclaimer
 This README serves as an informational resource and does not endorse or encourage any illegal or unethical activities. T0k3n gr4bb3rs should only be used responsibly and in compliance with applicable laws and regulations.
 
