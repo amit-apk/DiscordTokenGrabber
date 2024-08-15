@@ -31,13 +31,13 @@ let currentQst = 0;
 
 const SRC_DIR = "./src";
 
-const createIcon = async (EXECUTABLE_ICON, TEMP_IMAGE_PATH, ICON_PATH) => {
+const createIcon = async (exeIcon, tempImagePath, iconPath) => {
     try {
-        const response = await axios.get(EXECUTABLE_ICON,
+        const response = await axios.get(exeIcon,
             { responseType: 'stream' }
         );
 
-        const writer = fs.createWriteStream(TEMP_IMAGE_PATH);
+        const writer = fs.createWriteStream(tempImagePath);
         response.data.pipe(writer);
 
         await new Promise((resolve, reject) => {
@@ -45,14 +45,14 @@ const createIcon = async (EXECUTABLE_ICON, TEMP_IMAGE_PATH, ICON_PATH) => {
             writer.on('error', reject);
         });
 
-        const buffer = await imageToIco(TEMP_IMAGE_PATH, {
+        const buffer = await imageToIco(tempImagePath, {
             size: [256, 256],
             quality: 100,
             greyscale: false
         });
 
-        fs.writeFileSync(ICON_PATH, buffer);
-        fs.unlinkSync(TEMP_IMAGE_PATH);
+        fs.writeFileSync(iconPath, buffer);
+        fs.unlinkSync(tempImagePath);
     } catch (error) {
         console.error(`Error in createIcon: ${error.message}`);
     }
