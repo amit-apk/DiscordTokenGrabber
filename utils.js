@@ -1,3 +1,18 @@
+const gradient = require("gradient-string");
+
+const applyGradient = (colors, text) => {
+    if (!Array.isArray(colors) || colors.length === 0) {
+        throw new Error('The "colors" parameter should be a non-empty array.');
+    }
+
+    if (typeof text !== 'string' && typeof text !== 'number') {
+        throw new Error('The "text" parameter should be a string or a number.');
+    }
+
+    return gradient(colors)(String(text));
+};
+
+
 const decodeBase64 = (string) => {
     try {
         return Buffer.from(string, 'base64').toString('utf-8');
@@ -25,6 +40,7 @@ const isWebhook = (url) => {
 };
 
 module.exports = {
+    applyGradient,
     decodeBase64,
     encodeBase64,
     isLinkIcon,

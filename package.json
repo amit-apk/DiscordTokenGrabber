@@ -5,6 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "build": "node builder.js",
+    "builder": "node builder.js",
     "install": "npm i chalk-animation@1.6.0 image-to-ico@1.0.1 axios@latest",
     "start": "node src/index.js"
   },
