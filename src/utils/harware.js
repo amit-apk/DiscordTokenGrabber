@@ -59,11 +59,14 @@ function filterProcesses(name){
                 reject(err);
                 return;
             }
+
             const lines = stdout.split("\n");
             const processes = [];
+
             for (const line of lines) {
                 if (line.toLowerCase().includes(name.toLowerCase())) {
                     const columns = line.split(/\s+/);
+                    
                     processes.push({
                         name: columns[0],
                         pid: parseInt(columns[1]),
@@ -79,34 +82,38 @@ function filterProcesses(name){
     });
 }
 
-function getProfiles(path, name) {
-    const profile = path.split("%PROFILE%");
-
+function getProfiles(basePath, profileName) {
     try {
-        if (profile.length == 1) {
+        const profilePathParts = basePath.split('%PROFILE%');
+        
+        if (profilePathParts.length === 1) {
             return [{
-                path: path,
-                name: name,
+                path: basePath,
+                name: profileName,
             }];
         }
-        if (!fs.existsSync(profile[0])) return [];
 
-        var dirs = fs.readdirSync(profile[0]);
-        var profiles = [];
+        const [baseDir, profileSubDir] = profilePathParts;
+        const profiles = [];
 
-        for (var i = 0; i < dirs.length; i++) {
-            var dir = dirs[i];
+        if (!fs.existsSync(baseDir)) {
+            return [];
+        }
 
-            if (fs.existsSync(profile[0] + dir + profile[1])) {
+        const dirs = fs.readdirSync(baseDir);
+
+        for (const dir of dirs) {
+            const profilePath = path.join(baseDir, dir, profileSubDir);
+            if (fs.existsSync(profilePath)) {
                 profiles.push({
-                    path: profile[0] + dir + profile[1],
-                    profile: name + " " + dir,
+                    path: profilePath,
+                    name: `${profileName} ${dir}`,
                 });
             }
         }
-        
+
         return profiles;
-    } catch (err) {
+    } catch (error) {
         return [];
     }
 }
