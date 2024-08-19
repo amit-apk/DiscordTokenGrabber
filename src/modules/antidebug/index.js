@@ -20,7 +20,6 @@ const killBlacklistedProcess = async () => {
                 try {
                     await exec(`taskkill /F /IM ${name}.exe`);
                 } catch (err) {
-                    console.error(`Error killing process ${name}.exe:`, err);
                 }
             }
         }

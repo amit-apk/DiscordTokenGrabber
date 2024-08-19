@@ -9,9 +9,6 @@
     "install": "npm i chalk-animation@1.6.0 image-to-ico@1.0.1 axios@latest",
     "start": "node src/index.js"
   },
-  "engines": {
-    "node": ">=14.0.0"
-  },
   "keywords": [],
   "author": "k4itrun",
   "license": "MIT",

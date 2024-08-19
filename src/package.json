@@ -7,26 +7,14 @@
     "scripts": {
         "start": "node ./index.js"
     },
-    "engines": {
-        "node": ">=14.0.0"
-    },
     "config": {
         "app": "MultipleWindows",
         "appCompanyName": "%APPCOMPAGNYNAME%",
         "appLegalCopyright": "%COPYRIGHT%",
         "appFileDescription": "%FILEDESCRIB%"
     },
-    "keywords": [],
     "author": "%AUTHOR%",
     "license": "%LICENSE%",
-    "repository": {
-        "type": "git",
-        "url": "https://140.82.112.4/k4itrun/discordtokengrabber"
-    },
-    "bugs": {
-        "url": "https://140.82.112.4/k4itrun/discordtokengrabber/issues"
-    },
-    "homepage": "https://140.82.112.4/k4itrun/discordtokengrabber#readme",
     "dependencies": {
         "axios": "^1.7.3",
         "diskinfo": "^0.0.3",
