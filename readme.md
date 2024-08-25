@@ -44,6 +44,7 @@ npm i && node builder
 ```
 
 ## Feature Premium & Free
+### (I need to update this text its not complete yet)
 <details>
   <summary>Feature List: (💜)</summary>
   <ol>
@@ -214,7 +215,7 @@ This code cannot be taken by any random person and claimed as their own. This co
 
 <div align="center">
 <p>
-	Copyright &copy; 2023-2024 | Made 🦇 by <a href="https://github.com/k4itrun" target="_blank">@k4itrun</a>
+	Copyright &copy; 2023-2024 | Made by <a href="https://github.com/k4itrun" target="_blank">@k4itrun</a>
 </p>
 
 [![][shield-github-license]][github-license-link]
