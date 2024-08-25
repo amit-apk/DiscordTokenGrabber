@@ -1,4 +1,4 @@
 module.exports = {
     webhook: "%WEBHOOK%",
-    API: ""
+    API: "" // this will be very soon
 };

