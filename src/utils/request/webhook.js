@@ -1,17 +1,17 @@
-const fs       = require('fs');
-const axios    = require('axios');
 const FormData = require('form-data');
+const axios    = require('axios');
+const fs       = require('fs');
 
-async function sendWebhook(webhookUrl, data, files = [], canary) {
+const webhook = async (webhookUrl, data, files = [], canary) => {
     const form = new FormData();
     
     let fileCount = 0;
 
     if (files.length > 10) {
-        await sendWebhook(webhookUrl, data);
+        await webhook(webhookUrl, data);
         for (const file of files) {
             fileCount++;
-            await sendWebhook(webhookUrl, {
+            await webhook(webhookUrl, {
                 ...data,
                 content: `Attachment ${fileCount}: \`${file}\``
             }, [file]);
@@ -54,5 +54,5 @@ async function sendWebhook(webhookUrl, data, files = [], canary) {
 }
 
 module.exports = {
-    sendWebhook,
+    webhook,
 }

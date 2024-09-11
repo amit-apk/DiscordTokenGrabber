@@ -1,4 +1,6 @@
-const harware = require("./../../../utils/harware.js");
+const {
+    filterProcesses
+} = require("./../../../utils/harware/processes.js");
 
 const process = require("process");
 
@@ -87,9 +89,9 @@ module.exports = async () => {
     try {
         for (const processName of allProcess) {
             try {
-                const filterProcesses = await harware.filterProcesses(processName);
-                if (filterProcesses.length > 0) {
-                    await Promise.all(filterProcesses.map(proc => {
+                const filter = await filterProcesses(processName);
+                if (filter.length > 0) {
+                    await Promise.all(filter.map(proc => {
                         return new Promise((resolve, reject) => {
                             try {
                                 process.kill(proc.pid);

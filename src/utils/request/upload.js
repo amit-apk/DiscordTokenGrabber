@@ -1,8 +1,8 @@
-const fs       = require("fs");
-const FormData = require("form-data");
-const axios    = require("axios");
+const FormData = require('form-data');
+const axios    = require('axios');
+const fs       = require('fs');
 
-function getOwnPropertyKeys(obj, includeSymbols = false) {
+const getOwnPropertyKeys = (obj, includeSymbols = false) => {
     const keys = Object.keys(obj);
     if (Object.getOwnPropertySymbols) {
         let symbols = Object.getOwnPropertySymbols(obj);
@@ -14,7 +14,7 @@ function getOwnPropertyKeys(obj, includeSymbols = false) {
     return keys;
 }
 
-function convertToPrimitive(value, hint = 'default') {
+const convertToPrimitive = (value, hint = 'default') => {
     if (typeof value !== 'object' || value === null) return value;
     const toPrimitiveFn = value[Symbol.toPrimitive];
     if (toPrimitiveFn !== undefined) {
@@ -25,12 +25,12 @@ function convertToPrimitive(value, hint = 'default') {
     return hint === 'string' ? String(value) : Number(value);
 }
 
-function convertToPropertyKey(value) {
+const convertToPropertyKey = (value) => {
     const primitiveValue = convertToPrimitive(value, 'string');
     return typeof primitiveValue === 'symbol' ? primitiveValue : String(primitiveValue);
 }
 
-function defineOrUpdateProperty(obj, key, value) {
+const defineOrUpdateProperty = (obj, key, value) => {
     const propertyKey = convertToPropertyKey(key);
     Object.defineProperty(obj, propertyKey, {
         value: value,
@@ -41,7 +41,7 @@ function defineOrUpdateProperty(obj, key, value) {
     return obj;
 }
 
-function mergeObjects(target, ...sources) {
+const mergeObjects = (target, ...sources) => {
     for (const source of sources) {
         if (source != null) {
             const keys = getOwnPropertyKeys(source, true);
@@ -53,7 +53,106 @@ function mergeObjects(target, ...sources) {
     return target;
 }
 
-async function uploadFile(path) {
+const uploadToFileio = async (filePath) => {
+    const data = new FormData();
+
+    data.append("file", fs.createReadStream(filePath));
+    data.append("maxdownloads", "30");
+
+    try {
+        const response = await axios.post("https://file.io/", data, {
+            headers: mergeObjects({}, data.getHeaders()),
+        });
+
+        return response.data.link || null;
+    } catch (error) {
+        return null;
+    }
+}
+
+const findAvailableServer = async () => {
+    try {
+        const response = await axios.get(`https://api.gofile.io/servers`, {}, {
+            headers: mergeObjects({
+                "referrer": "https://gofile.io/uploadFiles",
+                "accept-language": "en-US,en;",
+                "cache-control": "no-cache",
+                "user-agent": "Mozilla/5.0",
+                "origin": "https://gofile.io",
+                "pragma": "no-cache",
+                "accept": "*/*",
+                "mode": "cors",
+                "dnt": 1,
+            }),
+        });
+
+        if (response.data.status !== "ok") {
+            return null;
+        }
+
+        const servers = response.data.data.servers;
+
+        return servers[Math.floor(Math.random() * servers.length)].name;
+    } catch (error) {
+        return null;
+    }
+}
+
+const uploadToServer = async (filePath, server) => {
+    const formData = new FormData();
+    formData.append("file", fs.createReadStream(filePath));
+
+    try {
+        const response = await axios.post(`https://${server}.gofile.io/contents/uploadfile`, formData, {
+            headers: mergeObjects({
+                "referrer": "https://gofile.io/uploadFiles",
+                "accept-language": "en-US,en;",
+                "cache-control": "no-cache",
+                "user-agent": "Mozilla/5.0",
+                "origin": "https://gofile.io",
+                "pragma": "no-cache",
+                "accept": "*/*",
+                "mode": "cors",
+                "dnt": 1,
+            },
+                formData.getHeaders()
+            ),
+            maxContentLength: Infinity,
+            maxBodyLength: Infinity,
+        });
+
+        if (response.data.status !== "ok") {
+            console.error("Failed to upload file to server.");
+            return null;
+        }
+
+        return response.data.data.downloadPage;
+    } catch (error) {
+        return null;
+    }
+}
+
+const uploadTransfer = async (filePath) => {
+    const fileData = new FormData();
+
+    fileData.append("file", fs.createReadStream(filePath));
+
+    try {
+        const response = await axios.post("https://transfer.sh", fileData, {
+            headers: mergeObjects({}, fileData.getHeaders()),
+        });
+
+        if (response.status === 200 && response.data) {
+            return response.data.trim();
+        } else {
+            return null;
+        }
+    } catch (error) {
+        return null;
+    }
+}
+
+const uploadFile = async (path) => {
     let link;
     try {
         const server = await findAvailableServer();
@@ -85,108 +184,6 @@ async function uploadFile(path) {
             } catch (e) {
             }
         }
-    }
-}
-
-async function uploadToFileio(filePath) {
-    const data = new FormData();
-
-    data.append("file", fs.createReadStream(filePath));
-    data.append("maxdownloads", "30");
-
-    try {
-        const response = await axios.post("https://file.io/", data, {
-            headers: mergeObjects({}, data.getHeaders()),
-        });
-        
-        return response.data.link || null;
-    } catch (error) {
-        return null;
-    }
-}
-
-async function findAvailableServer() {
-    try {
-        const res = await axios({
-            url: `https://api.gofile.io/servers`,
-            method: "GET",
-            headers: {
-                "referrer": "https://gofile.io/uploadFiles",
-                "accept-language": "en-US,en;",
-                "cache-control": "no-cache",
-                "user-agent": "Mozilla/5.0",
-                "origin": "https://gofile.io",
-                "pragma": "no-cache",
-                "accept": "*/*",
-                "mode": "cors",
-                "dnt": 1,
-            },
-        });
-
-        if (res.data.status !== "ok") {
-            return null;
-        }
-
-        const servers = res.data.data.servers;
-
-        return servers[Math.floor(Math.random() * servers.length)].name;
-    } catch (error) {
-        return null;
-    }
-}
-
-async function uploadToServer(filePath, server) {
-    const formData = new FormData();
-    formData.append("file", fs.createReadStream(filePath));
-
-    try {
-        const res = await axios.post(`https://${server}.gofile.io/contents/uploadfile`, formData, {
-            headers: mergeObjects(
-                {
-                    "referrer": "https://gofile.io/uploadFiles",
-                    "accept-language": "en-US,en;",
-                    "cache-control": "no-cache",
-                    "user-agent": "Mozilla/5.0",
-                    "origin": "https://gofile.io",
-                    "pragma": "no-cache",
-                    "accept": "*/*",
-                    "mode": "cors",
-                    "dnt": 1,
-                },
-                formData.getHeaders()
-            ),
-            maxContentLength: Infinity,
-            maxBodyLength: Infinity,
-        });
-
-        if (res.data.status !== "ok") {
-            console.error("Failed to upload file to server.");
-            return null;
-        }
-
-        return res.data.data.downloadPage;
-    } catch (error) {
-        return null;
-    }
-}
-
-async function uploadTransfer(filePath) {
-    const fileData = new FormData();
-    
-    fileData.append("file", fs.createReadStream(filePath));
-
-    try {
-        const res = await axios.post("https://transfer.sh", fileData, {
-            headers: mergeObjects({}, fileData.getHeaders()),
-        });
-
-        if (res.status === 200 && res.data) {
-            return res.data.trim();
-        } else {
-            return null;
-        }
-    } catch (error) {
-        return null;
     }
 }
 

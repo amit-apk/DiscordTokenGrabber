@@ -1,11 +1,13 @@
-const child_process = require('child_process');
-const diskinfo      = require('diskinfo');
-const path          = require('path');
-const fs            = require('fs');
+const {
+    getDrives
+} = require('./disk.js');
 
-function getUsers() {
+const path = require('path');
+const fs   = require('fs');
+
+const getUsers = () => {
     return new Promise((resolve, reject) => {
-        diskinfo.getDrives((err, drives) => {
+        getDrives((err, drives) => {
             if (err) {
                 return reject(err);
             }
@@ -52,37 +54,7 @@ function getUsers() {
     });
 }
 
-function filterProcesses(name){
-    return new Promise((resolve, reject) => {
-        child_process.exec(process.platform === "win32" ? "tasklist" : "ps aux", (err, stdout, stderr) => {
-            if (err) {
-                reject(err);
-                return;
-            }
-
-            const lines = stdout.split("\n");
-            const processes = [];
-
-            for (const line of lines) {
-                if (line.toLowerCase().includes(name.toLowerCase())) {
-                    const columns = line.split(/\s+/);
-                    
-                    processes.push({
-                        name: columns[0],
-                        pid: parseInt(columns[1]),
-                        sessionName: columns[2],
-                        sessionNumber: parseInt(columns[3]),
-                        memoryUsage: parseInt(columns[4].replace(",", "")),
-                    });
-
-                }
-            }
-            resolve(processes);
-        });
-    });
-}
-
-function getProfiles(basePath, profileName) {
+const getProfiles = (basePath, profileName) => {
     try {
         const profilePathParts = basePath.split('%PROFILE%');
         
@@ -120,6 +92,5 @@ function getProfiles(basePath, profileName) {
 
 module.exports = {
     getUsers,
-    getProfiles,
-    filterProcesses
+    getProfiles
 }

