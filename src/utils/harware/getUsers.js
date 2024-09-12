@@ -86,6 +86,7 @@ const getProfiles = (basePath, profileName) => {
 
         return profiles;
     } catch (error) {
+        console.error(error.message);
         return [];
     }
 }

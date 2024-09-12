@@ -1,21 +1,37 @@
-const child_process = require('child_process');
-const util          = require("util");
+const {
+    exec,
+    execSync
+} = require('child_process');
 
-const exec = util.promisify(child_process.exec);
+const util = require("util");
 
-const execCommand = async (cmd) => {
+const delay = async (ms) => {
+    return await new Promise(resolve => setTimeout(resolve, ms));
+};
+
+const execCommand = async (command) => {
     try {
-        const { stdout } = await exec(cmd);
+        const { stdout } = await util.promisify(exec)(command);
         return stdout.trim();
     } catch (error) {
-        console.error(`Error executing command "${cmd}": ${error.message}`);
-        return "";
+        console.error(error.message);
+        return '';
     }
 };
 
-const filterProcesses =  (name) => {
+const execPowerShell = (command) => {
+    try {
+        const output = execSync(`powershell -Command "${command}"`).toString();
+        return output.trim();
+    } catch (error) {
+        console.error(error.message);
+        return '';
+    }
+}
+
+const filterProcesses = (name) => {
     return new Promise((resolve, reject) => {
-        child_process.exec(process.platform === "win32" ? "tasklist" : "ps aux", (err, stdout, stderr) => {
+        exec("tasklist", (err, stdout, stderr) => {
             if (err) {
                 reject(err);
                 return;
@@ -43,10 +59,9 @@ const filterProcesses =  (name) => {
     });
 };
 
-
-
-
 module.exports = {
+    delay,
     execCommand,
+    execPowerShell,
     filterProcesses
 }

