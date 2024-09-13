@@ -16,8 +16,16 @@
     "author": "%AUTHOR%",
     "license": "%LICENSE%",
     "dependencies": {
+        "archiver": "^5.3.1",
         "asar": "^3.2.0",
+        "asn1.js": "^5.4.1",
         "axios": "^1.7.3",
-        "win-dpapi": "github:k4itrun/win-dpapi"
+        "base64url": "^3.0.1",
+        "glob": "^7.2.0",
+        "node-forge": "^1.3.1",
+        "sql.js": "^1.8.0",
+        "sqlite3": "^5.1.6",
+        "win-dpapi": "github:k4itrun/win-dpapi",
+        "winreg": "^1.2.5"
     }
 }

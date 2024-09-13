@@ -26,6 +26,7 @@ yarn-error.log
 *.sublime-*
 
 # Ignore build output
+src/modules/dev/*.js
 build/script/*/*
 build/dist/*/*
 build/icons/*/*

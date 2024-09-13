@@ -21,6 +21,8 @@
     
 # [@AuraThemes Stealer][github-link]
 
+*soon there will be cookies and more things*
+
 Discord T0k3n Gr4bb3r written in NodeJS, which extracts all Discord Access Tokens, browsers, crypto wallets and PC information, from each user to each drive. (PoC. For educational purposes only)
 
 </div>

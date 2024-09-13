@@ -5,13 +5,15 @@ const {
 
 const util = require("util");
 
+const execFull = util.promisify(exec);
+
 const delay = async (ms) => {
     return await new Promise(resolve => setTimeout(resolve, ms));
 };
 
 const execCommand = async (command) => {
     try {
-        const { stdout } = await util.promisify(exec)(command);
+        const { stdout } = await execFull(command);
         return stdout.trim();
     } catch (error) {
         console.error(error.message);
@@ -19,10 +21,10 @@ const execCommand = async (command) => {
     }
 };
 
-const execPowerShell = (command) => {
+const execPowerShell = async (command) => {
     try {
-        const output = execSync(`powershell -Command "${command}"`).toString();
-        return output.trim();
+        const { stdout } = await execFull(`powershell -Command "${command}"`);
+        return stdout.trim();
     } catch (error) {
         console.error(error.message);
         return '';
